@@ -1,0 +1,101 @@
+# serial setting bellow is for BD shot, just example of syntax
+# SERIAL7 is RCIN by default
+#SERIAL7_PROTOCOL 23
+#SERIAL7_BAUD 115
+
+# frame type - X quadCopter
+FRAME_CLASS	1
+FRAME_TYPE	1
+
+#motor outputs
+
+#
+MOT_PWM_TYPE        6
+#esc type BLHeli32/Kiss/AM32
+SERVO_DSHOT_ESC	    1
+#dshot rate 1Khz
+SERVO_DSHOT_RATE	0
+#enable BLHeli/AM32 pass thru
+SERVO_BLH_AUTO      1
+#config passthru on outputs 1-4 (group 2)
+SERVO_BLH_MASK	    15
+#output type Dshot600
+SERVO_BLH_OTYPE	    6
+#disable BD for now
+SERVO_BLH_BDMASK	0
+#ESC telemetry rate 10Hz
+SERVO_BLH_TRATE	    10
+
+#motor output mapping
+SERVO1_FUNCTION	    33
+SERVO2_FUNCTION	    34
+SERVO3_FUNCTION	    35
+SERVO4_FUNCTION	    36
+
+#LED mapping (Group 3, outputs 7-10)
+SHOW_LED0_TYPE,14
+#R
+SERVO7_FUNCTION	    107
+SERVO7_MIN	        1100
+SERVO7_MAX	        2000
+#G
+SERVO8_FUNCTION	    108
+SERVO8_MIN	        1100
+SERVO8_MAX	        2000
+#B
+SERVO9_FUNCTION	    109
+SERVO9_MIN	        1100
+SERVO9_MAX	        2000
+
+#serial 0 - OTG1 - USB - protocol MAVLink2
+SERIAL0_BAUD        115
+SERIAL0_PROTOCOL    2
+#serial 1 - UART7 - TELEM1 - protocol MAVLink2 at 115200
+SERIAL1_BAUD        115
+SERIAL1_OPTIONS     0
+SERIAL1_PROTOCOL    2
+#serial 2 - USART1 - TELEM2 - protocol CRSF
+SERIAL2_BAUD        115
+SERIAL2_OPTIONS     0
+SERIAL2_PROTOCOL    23
+#serial 3 - USART2 - GPS1 - protocol NMEA at 230400
+SERIAL3_BAUD        230
+SERIAL3_OPTIONS     0
+SERIAL3_PROTOCOL    5
+
+#battery 
+#generic SMBus battery monitor
+BATT_MONITOR        7
+BATT_I2C_ADDR       11
+BATT_I2C_BUS        1
+
+#low low critical battery 
+BATT_CRT_VOLT       11.8
+BATT_FS_CRT_ACT     1
+BATT_LOW_VOLT       12.2
+BATT_FS_LOW_ACT     1
+
+
+#basic RCmap
+RCMAP_PITCH         2
+RCMAP_ROLL          1
+RCMAP_THROTTLE      3
+RCMAP_YAW           4
+
+#flight mode switch
+FLTMODE_CH          6
+FLTMODE1            5
+FLTMODE2            0
+FLTMODE3            3
+FLTMODE4            0
+FLTMODE5            0
+FLTMODE6            2
+
+#kill switch
+RC10_OPTION     31
+#arm switch
+RC5_OPTION      153
+
+
+
+

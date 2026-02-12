@@ -23,6 +23,7 @@ define CH_CFG_ST_RESOLUTION 16
 # USB
 PA11 OTG_FS_DM OTG1
 PA12 OTG_FS_DP OTG1
+USB_STRING_MANUFACTURER "TurtleDrones"
 
 # SWD
 PA13 JTMS-SWDIO SWD
@@ -59,13 +60,26 @@ PE14 SPI4_MOSI SPI4
 # two I2C bus
 I2C_ORDER I2C2 I2C1
 
-# I2C1 (logical bus 1)  
+# I2C1 (logical bus 1)  - GPS a baterka
 PB6 I2C1_SCL I2C1
 PB7 I2C1_SDA I2C1
 
-# I2C2 (logical bus 0)
+# I2C2 (logical bus 0) - baro board
 PB10 I2C2_SCL I2C2
 PB11 I2C2_SDA I2C2
+
+#I2c4 na PD12 and PD13 (namisto PWM 7 a 8)
+#nebo I2C4 na PB8 a PB9 (namisto UART4)
+#poexperimentovat s DMA
+
+# HAL_I2C_INTERNAL_MASK definuje sbernice na kterych se nedela probing. respektuje logicke razeni sbernic. value = 1 znamena ze  I2C2 je externi.
+define HAL_I2C_INTERNAL_MASK 0 
+
+NODMA I2C*
+define STM32_I2C_USE_DMA FALSE
+# test na 40khz
+define HAL_I2C_MAX_CLOCK 100000 # hodnoty mensi nez 100k ignorovano, zmeni se na 100k
+# na jinych FC funguje baro a compass na I2C0, a tady to dela problemy
 
 # ADC
 PC0 BATT_VOLTAGE_SENS ADC1 SCALE(1)
@@ -74,12 +88,12 @@ PC1 BATT_CURRENT_SENS ADC1 SCALE(1)
 # PA7 BATT2_CURRENT_SENS ADC1 SCALE(1)
 
 # TODO change batt source to SMBus later
-define HAL_BATT_MONITOR_DEFAULT 4
+define HAL_BATT_MONITOR_DEFAULT 3
 define HAL_BATT_VOLT_PIN 10
 define HAL_BATT_CURR_PIN 11
 #define HAL_BATT2_VOLT_PIN 18
 #define HAL_BATT2_CURR_PIN 7
-define HAL_BATT_VOLT_SCALE 11.0
+define HAL_BATT_VOLT_SCALE 22.0
 define HAL_BATT_CURR_SCALE 40.0
 #define HAL_BATT2_VOLT_SCALE 11.0
 
@@ -99,7 +113,16 @@ define HAL_GPIO_A_LED_PIN 91
 define HAL_GPIO_B_LED_PIN 90
 
 # order of UARTs (and USB)
-SERIAL_ORDER OTG1 UART7 USART1 USART2 USART3 UART8 UART4 USART6 OTG2
+SERIAL_ORDER OTG1 UART7 USART1 USART2 USART3 UART8 UART4 USART6
+# OTG - serial0
+# telem 1(uart7) - serial1
+# telem 2(usart1) - serial2 - here is CRSF radio connected
+# gps1(usart2) - serial3
+# gps2(usart3) - serial4
+# esc telemetr(uart8) - serial5
+# spare(uart4) - serial6
+# rc input(usart6) - serial7
+
 
 # USART1 (telem2) - ok
 PA10 USART1_RX USART1
@@ -130,26 +153,37 @@ PC7 USART6_RX USART6 NODMA ALT(1)
 PE7 UART7_RX UART7
 PE8 UART7_TX UART7
 PE10 UART7_CTS UART7
-PE9  UART7_RTS UART7
+PE9  UART7_RTS UART7 LOW PULLDOWN
 
 # UART8 (spare)
 PE0 UART8_RX UART8 # ESC Telemetry G1
 PE1 UART8_TX UART8 # not connected
 
 # CAN bus
-PD0 CAN1_RX CAN1
-PD1 CAN1_TX CAN1
-PD3 GPIO_CAN1_SILENT OUTPUT PUSHPULL SPEED_LOW LOW GPIO(70)
+# PD0 CAN1_RX CAN1
+# PD1 CAN1_TX CAN1
+# PD3 GPIO_CAN1_SILENT OUTPUT PUSHPULL SPEED_LOW LOW GPIO(70)
+
+#define AP_CAN_ENABLED 0 still not working but get different errors, can still compiling
+define HAL_USE_CAN 0
 
 # Motors
-# group 1
-PB0  TIM8_CH2N TIM8  PWM(1)  GPIO(50)
-PB1  TIM8_CH3N TIM8  PWM(2)  GPIO(51)
 # Group 2
-PA0  TIM5_CH1  TIM5  PWM(3)  GPIO(52) #Motor 3
-PA1  TIM5_CH2  TIM5  PWM(4)  GPIO(53) #Motor 4
-PA2  TIM5_CH3  TIM5  PWM(5)  GPIO(54) #Motor 5
-PA3  TIM5_CH4  TIM5  PWM(6)  GPIO(55) #Motor 6
+#PA0  TIM5_CH1  TIM5  PWM(1)  GPIO(52) #Motor 3
+#PA1  TIM5_CH2  TIM5  PWM(2)  GPIO(53) #Motor 4
+#PA2  TIM5_CH3  TIM5  PWM(3)  GPIO(54) #Motor 5
+#PA3  TIM5_CH4  TIM5  PWM(4)  GPIO(55) #Motor 6
+
+#BDSHOT group 2
+PA0  TIM5_CH1 TIM5 PWM(1) GPIO(52) BIDIR
+PA1  TIM5_CH2 TIM5 PWM(2) GPIO(53)
+PA2  TIM5_CH3 TIM5 PWM(3) GPIO(54) BIDIR
+PA3  TIM5_CH4 TIM5 PWM(4) GPIO(55)
+
+# group 1
+PB0  TIM8_CH2N TIM8  PWM(5)  GPIO(50)
+PB1  TIM8_CH3N TIM8  PWM(6)  GPIO(51)
+
 # Group 3
 PD12 TIM4_CH1 TIM4 PWM(7) GPIO(56)
 PD13 TIM4_CH2 TIM4 PWM(8) GPIO(57)
@@ -187,10 +221,11 @@ STORAGE_FLASH_PAGE 14
 
 # spi devices
 # test slow first 
+SPIDEV icm42688_1  SPI1 DEVID1 IMU1_CS      MODE3  2*MHZ 10*MHZ   
+SPIDEV icm42688_2  SPI4 DEVID1 IMU2_CS      MODE3  2*MHZ 10*MHZ
+#old unsued IMU from default config
 # SPIDEV icm42688  SPI1 DEVID1 IMU1_CS      MODE3  2*MHZ 16*MHZ 
-SPIDEV icm42688_1  SPI1 DEVID1 IMU1_CS      MODE3  1*MHZ 4*MHZ   # Clock is 100Mhz so highest clock <= 24Mhz is 100Mhz/8
 # SPIDEV mpu6000   SPI1 DEVID1 IMU1_CS      MODE3  1*MHZ  4*MHZ
-SPIDEV icm42688_2  SPI4 DEVID1 IMU2_CS      MODE3  1*MHZ  4*MHZ
 # SPIDEV icm42605  SPI4 DEVID1 IMU3_CS      MODE3  2*MHZ 16*MHZ
 # SPIDEV osd       SPI2 DEVID4 MAX7456_CS   MODE0 10*MHZ 10*MHZ
 
@@ -200,30 +235,47 @@ DMA_NOSHARE SPI1* SPI4*
 # SPI3 external connections
 # SPIDEV pixartflow   SPI3 DEVID1  EXT_CS1  MODE3   2*MHZ  2*MHZ
 
+#############
+# IMU part
+#############
+# turtle drone FC
+#IMU Invensensev3 SPI:icm42688_1 ROTATION_NONE
+#IMU Invensensev3 SPI:icm42688_2 ROTATION_YAW_270 
+
+#fix for TDK axis orientation
+IMU Invensensev3 SPI:icm42688_1 ROTATION_YAW_270
+IMU Invensensev3 SPI:icm42688_2 ROTATION_NONE
+#pitch 180 is equal to #ROTATION_ROLL_180_YAW_180 
+
+# povoleni HAL_DEFAULT_INS_FAST_SAMPLE zpusobi ze prvni IMU jede na 2khz a druhy na 1khz, to zpusobuje spoustu problemu s casovanim, vypnuti fast sample by melo vyresit problemy s IMO inconsent.
+define HAL_DEFAULT_INS_FAST_SAMPLE 3
+# s 0 se stale obevuje accel inconsisten. s 3 taky
+#define HAL_DEFAULT_INS_FAST_SAMPLE 3
+
+
+####################
+#BARO part
+####################
+#our baro, correct definition
+BARO BMP388 I2C:0:0x76
+# commented out just for mag test
+#define HAL_BARO_ALLOW_INIT_NO_BARO 1
+
+##################
+#COMPASS part
+##################
+
+COMPASS IST8310 I2C:0:0x0C true ROTATION_ROLL_180
+# force external je potreba nastavit na true, jinak to nefunguje na externi sbernici
 # no built-in compass, but probe the i2c bus for all possible
 # external compass types
 define ALLOW_ARM_NO_COMPASS
-define AP_COMPASS_PROBING_ENABLED 1
-define HAL_I2C_INTERNAL_MASK 0
-define HAL_COMPASS_AUTO_ROT_DEFAULT 2
+# define AP_COMPASS_PROBING_ENABLED 1 #tohle je obsolete, nahrazeno HAL_PROBE_EXTERNAL_I2C_COMPASSES
+# define HAL_PROBE_EXTERNAL_I2C_COMPASSES
+# pokud je povoleno HAL_PROBE_EXTERNAL_I2C_COMPAS tak to zkousi hledat kompasy a nefunguje inicializace baro
 
-# two IMUs
-# H743-V1,      ICM20602, MPU6000
-# H743-V1.5/V2, ICM42605, MPU6000
-# H743-V3,      ICM42688P, ICM42605
-# IMU Invensensev3 SPI:icm42688 ROTATION_YAW_180
-# IMU Invensensev3 SPI:icm42605 ROTATION_YAW_270
-# IMU Invensense SPI:icm20602 ROTATION_ROLL_180_YAW_270
-# IMU Invensense SPI:mpu6000 ROTATION_ROLL_180_YAW_270
-# turtle drone FC
-IMU Invensensev3 SPI:icm42688_1 IMU1 ROTATION_NONE
-IMU Invensensev3 SPI:icm42688_2 IMU2 ROTATION_YAW_90
-define HAL_DEFAULT_INS_FAST_SAMPLE 1
+#define HAL_COMPASS_AUTO_ROT_DEFAULT 2
 
-# DPS310 integrated on I2C2 bus, multiple possible choices for external barometer
-# BARO MS5611 I2C:0:0x77
-# BARO DPS310 I2C:0:0x76
-BARO BMP388 I2C:0:0x76
 
 define HAL_OS_FATFS_IO 1
 

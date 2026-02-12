@@ -1,0 +1,1660 @@
+Searching for hwdef.dat files in: /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef
+================================================================================
+Found 358 hwdef.dat files
+
+
+================================================================================
+RESULTS - H7 BOARDS WITH BIDIR SUPPORT
+================================================================================
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/3DRControlZeroG/hwdef.dat H7 cpu with BIDIR support
+  Board: 3DRControlZeroG
+  Total PWM outputs: 8
+  BIDIR outputs: 5
+
+  All PWM outputs:
+    PE14 TIM1_CH4 TIM1 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PE13 TIM1_CH3 TIM1 PWM(2) GPIO(51)
+    PE11 TIM1_CH2 TIM1 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PE9  TIM1_CH1 TIM1 PWM(4) GPIO(53)
+    PD13 TIM4_CH2 TIM4 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PD14 TIM4_CH3 TIM4 PWM(6) GPIO(55) BIDIR <-- BIDIR
+    PI5  TIM8_CH1 TIM8 PWM(7) GPIO(56) BIDIR <-- BIDIR
+    PI6  TIM8_CH2 TIM8 PWM(8) GPIO(57)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/AEDROXH7/hwdef.dat H7 cpu with BIDIR support
+  Board: AEDROXH7
+  Total PWM outputs: 9
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PC7  TIM8_CH2 TIM8  PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PC6  TIM8_CH1 TIM8  PWM(2) GPIO(51)
+    PC9  TIM8_CH4 TIM8  PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PC8  TIM8_CH3 TIM8  PWM(4) GPIO(53)
+    PE9  TIM1_CH1 TIM1  PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PE11 TIM1_CH2 TIM1  PWM(6) GPIO(55)
+    PE13 TIM1_CH3 TIM1  PWM(7) GPIO(56) BIDIR <-- BIDIR
+    PE14 TIM1_CH4 TIM1  PWM(8) GPIO(57)
+    PA5 TIM2_CH1 TIM2 PWM(9) GPIO(58)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/AEROFOX-H7/hwdef.dat H7 cpu with BIDIR support
+  Board: AEROFOX-H7
+  Total PWM outputs: 16
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PA0    TIM2_CH1 TIM2 PWM(1)  GPIO(50) BIDIR <-- BIDIR
+    PA1    TIM2_CH2 TIM2 PWM(2)  GPIO(51)
+    PE9     TIM1_CH1 TIM1 PWM(3)  GPIO(52) BIDIR <-- BIDIR
+    PE11   TIM1_CH2 TIM1 PWM(4)  GPIO(53)
+    PD12  TIM4_CH1 TIM4 PWM(5)  GPIO(54) BIDIR <-- BIDIR
+    PD13  TIM4_CH2 TIM4 PWM(6)  GPIO(55)
+    PC6    TIM3_CH1 TIM3 PWM(7)  GPIO(56) BIDIR <-- BIDIR
+    PC7    TIM3_CH2 TIM3 PWM(8)  GPIO(57)
+    PA2    TIM15_CH1    TIM15 PWM(9)  GPIO(58)
+    PA3    TIM15_CH2    TIM15 PWM(10) GPIO(59)
+    PA7    TIM14_CH1   TIM14 PWM(11) GPIO(60)
+    PA6    TIM13_CH1   TIM13 PWM(12) GPIO(61)
+    PC9  TIM8_CH4     TIM8 PWM(13) GPIO(62)
+    PC8  TIM8_CH3     TIM8 PWM(14) GPIO(63)
+    PB15    TIM12_CH2     TIM12 PWM(15) GPIO(64)
+    PB14    TIM12_CH1     TIM12 PWM(16) GPIO(65)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/ARK_FPV/hwdef.dat H7 cpu with BIDIR support
+  Board: ARK_FPV
+  Total PWM outputs: 9
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PI0  TIM5_CH4 TIM5 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PH12 TIM5_CH3 TIM5 PWM(2) GPIO(51) BIDIR <-- BIDIR
+    PH11 TIM5_CH2 TIM5 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PH10 TIM5_CH1 TIM5 PWM(4) GPIO(53) BIDIR <-- BIDIR
+    PI5  TIM8_CH1 TIM8 PWM(5) GPIO(54)
+    PI6  TIM8_CH2 TIM8 PWM(6) GPIO(55)
+    PI7  TIM8_CH3 TIM8 PWM(7) GPIO(56)
+    PI2  TIM8_CH4 TIM8 PWM(8) GPIO(57)
+    PD12 TIM4_CH1 TIM4 PWM(9) GPIO(58)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/ARK_PI6X/hwdef.dat H7 cpu with BIDIR support
+  Board: ARK_PI6X
+  Total PWM outputs: 8
+  BIDIR outputs: 2
+
+  All PWM outputs:
+    PI0  TIM5_CH4 TIM5 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PH12 TIM5_CH3 TIM5 PWM(2) GPIO(51)
+    PH11 TIM5_CH2 TIM5 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PH10 TIM5_CH1 TIM5 PWM(4) GPIO(53)
+    PD13 TIM4_CH2 TIM4 PWM(5) GPIO(54)
+    PD14 TIM4_CH3 TIM4 PWM(6) GPIO(55)
+    PH6 TIM12_CH1 TIM12 PWM(7) GPIO(56) NODMA
+    PH9 TIM12_CH2 TIM12 PWM(8) GPIO(57) NODMA
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/AcctonGodwit_GA1/hwdef.dat H7 cpu with BIDIR support
+  Board: AcctonGodwit_GA1
+  Total PWM outputs: 8
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PI0  TIM5_CH4 TIM5 PWM(1) GPIO(50)   BIDIR <-- BIDIR
+    PH12 TIM5_CH3 TIM5 PWM(2) GPIO(51)
+    PH11 TIM5_CH2 TIM5 PWM(3) GPIO(52)   BIDIR <-- BIDIR
+    PH10 TIM5_CH1 TIM5 PWM(4) GPIO(53)
+    PD13 TIM4_CH2 TIM4 PWM(5) GPIO(54)   BIDIR <-- BIDIR
+    PD14 TIM4_CH3 TIM4 PWM(6) GPIO(55)   BIDIR <-- BIDIR
+    PH6  TIM12_CH1 TIM12 PWM(7) GPIO(56) NODMA
+    PH9  TIM12_CH2 TIM12 PWM(8) GPIO(57) NODMA
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Airvolute-DCS2/hwdef.dat H7 cpu with BIDIR support
+  Board: Airvolute-DCS2
+  Total PWM outputs: 4
+  BIDIR outputs: 2
+
+  All PWM outputs:
+    PB3  TIM2_CH2 TIM2 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PB10 TIM2_CH3 TIM2 PWM(2) GPIO(51)
+    PE11 TIM1_CH2 TIM1 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PE14 TIM1_CH4 TIM1 PWM(4) GPIO(53)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/AnyleafH7/hwdef.dat H7 cpu with BIDIR support
+  Board: AnyleafH7
+  Total PWM outputs: 8
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PC6  TIM3_CH1 TIM3  PWM(1)  GPIO(50)  BIDIR <-- BIDIR
+    PC7  TIM3_CH2 TIM3  PWM(2)  GPIO(51)
+    PC8  TIM3_CH3  TIM3  PWM(3)  GPIO(52)  BIDIR <-- BIDIR
+    PC9  TIM3_CH4  TIM3  PWM(4)  GPIO(53)
+    PE5  TIM15_CH1  TIM15  PWM(5)  GPIO(54)  BIDIR <-- BIDIR
+    PE6  TIM15_CH2  TIM15  PWM(6)  GPIO(55)
+    PE13 TIM1_CH3 TIM1 PWM(7) GPIO(56)  BIDIR <-- BIDIR
+    PE14 TIM1_CH4 TIM1 PWM(8) GPIO(57)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/BROTHERHOBBYH743/hwdef.dat H7 cpu with BIDIR support
+  Board: BROTHERHOBBYH743
+  Total PWM outputs: 13
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PB0  TIM3_CH3 TIM3  PWM(1)  GPIO(50) BIDIR <-- BIDIR
+    PB1  TIM3_CH4 TIM3  PWM(2)  GPIO(51)
+    PA0  TIM2_CH1 TIM2  PWM(3)  GPIO(52) BIDIR <-- BIDIR
+    PA1  TIM2_CH2 TIM2  PWM(4)  GPIO(53)
+    PA2  TIM5_CH3 TIM5  PWM(5)  GPIO(54) BIDIR <-- BIDIR
+    PA3  TIM5_CH4 TIM5  PWM(6)  GPIO(55)
+    PD12 TIM4_CH1 TIM4  PWM(7)  GPIO(56) BIDIR <-- BIDIR
+    PD13 TIM4_CH2 TIM4  PWM(8)  GPIO(57)
+    PD14 TIM4_CH3 TIM4  PWM(9)  GPIO(58)
+    PD15 TIM4_CH4 TIM4  PWM(10) GPIO(59)
+    PE5  TIM15_CH1 TIM15 PWM(11) GPIO(60) NODMA # SERVO 1
+    PE6  TIM15_CH2 TIM15 PWM(12) GPIO(61) NODMA # SERVO 2
+    PA8 TIM1_CH1 TIM1 PWM(13) GPIO(62) # for WS2812 LED
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CBU-H7-Stamp/hwdef.dat H7 cpu with BIDIR support
+  Board: CBU-H7-Stamp
+  Total PWM outputs: 10
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PH10 TIM5_CH1 TIM5 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PH11 TIM5_CH2 TIM5 PWM(2) GPIO(51)
+    PH12 TIM5_CH3 TIM5 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PI0  TIM5_CH4 TIM5 PWM(4) GPIO(53)
+    PD12 TIM4_CH1 TIM4 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PD13 TIM4_CH2 TIM4 PWM(6) GPIO(55)
+    PD14 TIM4_CH3 TIM4 PWM(7) GPIO(56) BIDIR <-- BIDIR
+    PD15 TIM4_CH4 TIM4 PWM(8) GPIO(57)
+    PA15 TIM2_CH1 TIM2 PWM(9) GPIO(58)
+    PB3  TIM2_CH2 TIM2 PWM(10) GPIO(59)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CUAV-7-Nano-ODID/hwdef.dat H7 cpu with BIDIR support
+  Board: CUAV-7-Nano-ODID
+  Total PWM outputs: 17
+  BIDIR outputs: 2
+
+  All PWM outputs:
+    PI0  TIM5_CH4  TIM5  PWM(1)  GPIO(50) BIDIR <-- BIDIR
+    PH12 TIM5_CH3  TIM5  PWM(2)  GPIO(51)
+    PH11 TIM5_CH2  TIM5  PWM(3)  GPIO(52) BIDIR <-- BIDIR
+    PH10 TIM5_CH1  TIM5  PWM(4)  GPIO(53)
+    PD13 TIM4_CH2  TIM4  PWM(5)  GPIO(54)
+    PD14 TIM4_CH3  TIM4  PWM(6)  GPIO(55)
+    PE11 TIM1_CH2  TIM1  PWM(7)  GPIO(56)
+    PE9  TIM1_CH1  TIM1  PWM(8)  GPIO(57)
+    PI6  TIM8_CH2  TIM8  PWM(9)  GPIO(58)
+    PI7  TIM8_CH3  TIM8  PWM(10) GPIO(59)
+    PI5  TIM8_CH1  TIM8  PWM(11) GPIO(60)
+    PE6  TIM15_CH2 TIM15 PWM(12) GPIO(61)
+    PH6  TIM12_CH1 TIM12 PWM(13) GPIO(62) NODMA
+    PH9  TIM12_CH2 TIM12 PWM(14) GPIO(63) NODMA
+    PG8 PWM_VOLT_SEL OUTPUT LOW GPIO(80)
+    define HAL_GPIO_PWM_VOLT_PIN 80
+    define HAL_GPIO_PWM_VOLT_3v3 0
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CUAV-7-Nano/hwdef.dat H7 cpu with BIDIR support
+  Board: CUAV-7-Nano
+  Total PWM outputs: 17
+  BIDIR outputs: 2
+
+  All PWM outputs:
+    PI0  TIM5_CH4  TIM5  PWM(1)  GPIO(50) BIDIR <-- BIDIR
+    PH12 TIM5_CH3  TIM5  PWM(2)  GPIO(51)
+    PH11 TIM5_CH2  TIM5  PWM(3)  GPIO(52) BIDIR <-- BIDIR
+    PH10 TIM5_CH1  TIM5  PWM(4)  GPIO(53)
+    PD13 TIM4_CH2  TIM4  PWM(5)  GPIO(54)
+    PD14 TIM4_CH3  TIM4  PWM(6)  GPIO(55)
+    PE11 TIM1_CH2  TIM1  PWM(7)  GPIO(56)
+    PE9  TIM1_CH1  TIM1  PWM(8)  GPIO(57)
+    PI6  TIM8_CH2  TIM8  PWM(9)  GPIO(58)
+    PI7  TIM8_CH3  TIM8  PWM(10) GPIO(59)
+    PI5  TIM8_CH1  TIM8  PWM(11) GPIO(60)
+    PE6  TIM15_CH2 TIM15 PWM(12) GPIO(61)
+    PH6  TIM12_CH1 TIM12 PWM(13) GPIO(62) NODMA
+    PH9  TIM12_CH2 TIM12 PWM(14) GPIO(63) NODMA
+    PG8 PWM_VOLT_SEL OUTPUT LOW GPIO(80)
+    define HAL_GPIO_PWM_VOLT_PIN 80
+    define HAL_GPIO_PWM_VOLT_3v3 0
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CUAV-Nora-bdshot/hwdef.dat H7 cpu with BIDIR support
+  Board: CUAV-Nora-bdshot
+  Total PWM outputs: 18
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PH10 TIM5_CH1 TIM5 PWM(1) GPIO(50)
+    PH11 TIM5_CH2 TIM5 PWM(2) GPIO(51)
+    PH12 TIM5_CH3 TIM5 PWM(3) GPIO(52)
+    PI0  TIM5_CH4 TIM5 PWM(4) GPIO(53)
+    PD12 TIM4_CH1 TIM4 PWM(5) GPIO(54)
+    PD13 TIM4_CH2 TIM4 PWM(6) GPIO(55)
+    PD14 TIM4_CH3 TIM4 PWM(7) GPIO(56)
+    PD15 TIM4_CH4 TIM4 PWM(8) GPIO(57)
+    PE9  TIM1_CH1  TIM1  PWM(9)  GPIO(58)
+    PE11 TIM1_CH2  TIM1  PWM(10) GPIO(59)
+    PA10 TIM1_CH3  TIM1  PWM(11) GPIO(60)
+    PE14 TIM1_CH4  TIM1  PWM(12) GPIO(61)
+    PH6  TIM12_CH1 TIM12 PWM(13) GPIO(62) NODMA
+    PH9  TIM12_CH2 TIM12 PWM(14) GPIO(63) NODMA
+    PH10 TIM5_CH1 TIM5 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PH12 TIM5_CH3 TIM5 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PD12 TIM4_CH1 TIM4 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PD14 TIM4_CH3 TIM4 PWM(7) GPIO(56) BIDIR <-- BIDIR
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CUAV-X25-EVO-ODID/hwdef.dat H7 cpu with BIDIR support
+  Board: CUAV-X25-EVO-ODID
+  Total PWM outputs: 19
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PI0  TIM5_CH4  TIM5  PWM(1)  GPIO(50) BIDIR <-- BIDIR
+    PH12 TIM5_CH3  TIM5  PWM(2)  GPIO(51)
+    PH11 TIM5_CH2  TIM5  PWM(3)  GPIO(52) BIDIR <-- BIDIR
+    PH10 TIM5_CH1  TIM5  PWM(4)  GPIO(53)
+    PD13 TIM4_CH2  TIM4  PWM(5)  GPIO(54)
+    PD14 TIM4_CH3  TIM4  PWM(6)  GPIO(55) BIDIR <-- BIDIR
+    PD12 TIM4_CH1  TIM4  PWM(7)  GPIO(56) BIDIR <-- BIDIR
+    PD15 TIM4_CH4  TIM4  PWM(8)  GPIO(57)
+    PE11 TIM1_CH2  TIM1  PWM(9)  GPIO(58)
+    PE9  TIM1_CH1  TIM1  PWM(10) GPIO(59)
+    PJ9  TIM1_CH3  TIM1  PWM(11) GPIO(60)
+    PI6  TIM8_CH2  TIM8  PWM(12) GPIO(61)
+    PI7  TIM8_CH3  TIM8  PWM(13) GPIO(62)
+    PI5  TIM8_CH1  TIM8  PWM(14) GPIO(63)
+    PH6  TIM12_CH1 TIM12 PWM(15) GPIO(64) NODMA
+    PH9  TIM12_CH2 TIM12 PWM(16) GPIO(65) NODMA
+    PG8 PWM_VOLT_SEL OUTPUT LOW GPIO(80)
+    define HAL_GPIO_PWM_VOLT_PIN 80
+    define HAL_GPIO_PWM_VOLT_3v3 0
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CUAV-X25-EVO/hwdef.dat H7 cpu with BIDIR support
+  Board: CUAV-X25-EVO
+  Total PWM outputs: 19
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PI0  TIM5_CH4  TIM5  PWM(1)  GPIO(50) BIDIR <-- BIDIR
+    PH12 TIM5_CH3  TIM5  PWM(2)  GPIO(51)
+    PH11 TIM5_CH2  TIM5  PWM(3)  GPIO(52) BIDIR <-- BIDIR
+    PH10 TIM5_CH1  TIM5  PWM(4)  GPIO(53)
+    PD13 TIM4_CH2  TIM4  PWM(5)  GPIO(54)
+    PD14 TIM4_CH3  TIM4  PWM(6)  GPIO(55) BIDIR <-- BIDIR
+    PD12 TIM4_CH1  TIM4  PWM(7)  GPIO(56) BIDIR <-- BIDIR
+    PD15 TIM4_CH4  TIM4  PWM(8)  GPIO(57)
+    PE11 TIM1_CH2  TIM1  PWM(9)  GPIO(58)
+    PE9  TIM1_CH1  TIM1  PWM(10) GPIO(59)
+    PJ9  TIM1_CH3  TIM1  PWM(11) GPIO(60)
+    PI6  TIM8_CH2  TIM8  PWM(12) GPIO(61)
+    PI7  TIM8_CH3  TIM8  PWM(13) GPIO(62)
+    PI5  TIM8_CH1  TIM8  PWM(14) GPIO(63)
+    PH6  TIM12_CH1 TIM12 PWM(15) GPIO(64) NODMA
+    PH9  TIM12_CH2 TIM12 PWM(16) GPIO(65) NODMA
+    PG8 PWM_VOLT_SEL OUTPUT LOW GPIO(80)
+    define HAL_GPIO_PWM_VOLT_PIN 80
+    define HAL_GPIO_PWM_VOLT_3v3 0
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CUAV-X7-bdshot/hwdef.dat H7 cpu with BIDIR support
+  Board: CUAV-X7-bdshot
+  Total PWM outputs: 16
+  BIDIR outputs: 2
+
+  All PWM outputs:
+    PH10 TIM5_CH1 TIM5 PWM(1) GPIO(50)
+    PH11 TIM5_CH2 TIM5 PWM(2) GPIO(51)
+    PH12 TIM5_CH3 TIM5 PWM(3) GPIO(52)
+    PI0  TIM5_CH4 TIM5 PWM(4) GPIO(53)
+    PD12 TIM4_CH1 TIM4 PWM(5) GPIO(54)
+    PD13 TIM4_CH2 TIM4 PWM(6) GPIO(55)
+    PD14 TIM4_CH3 TIM4 PWM(7) GPIO(56)
+    PD15 TIM4_CH4 TIM4 PWM(8) GPIO(57)
+    PE9  TIM1_CH1  TIM1  PWM(9)  GPIO(58)
+    PE11 TIM1_CH2  TIM1  PWM(10) GPIO(59)
+    PA10 TIM1_CH3  TIM1  PWM(11) GPIO(60)
+    PE14 TIM1_CH4  TIM1  PWM(12) GPIO(61)
+    PH6  TIM12_CH1 TIM12 PWM(13) GPIO(62) NODMA
+    PH9  TIM12_CH2 TIM12 PWM(14) GPIO(63) NODMA
+    PH10 TIM5_CH1 TIM5 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PH12 TIM5_CH3 TIM5 PWM(3) GPIO(52) BIDIR <-- BIDIR
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeOrange-bdshot/hwdef.dat H7 cpu with BIDIR support
+  Board: CubeOrange-bdshot
+  Total PWM outputs: 15
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PE14 TIM1_CH4 TIM1 PWM(1) GPIO(50)
+    PE13 TIM1_CH3 TIM1 PWM(2) GPIO(51)
+    PE11 TIM1_CH2 TIM1 PWM(3) GPIO(52)
+    PE9  TIM1_CH1 TIM1 PWM(4) GPIO(53)
+    PD13 TIM4_CH2 TIM4 PWM(5) GPIO(54)
+    PD14 TIM4_CH3 TIM4 PWM(6) GPIO(55)
+    PB4 PWM_VOLT_SEL OUTPUT HIGH GPIO(3)
+    define HAL_GPIO_PWM_VOLT_PIN 3
+    define HAL_GPIO_PWM_VOLT_3v3 1
+    PE14 TIM1_CH4 TIM1 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PE13 TIM1_CH3 TIM1 PWM(2) GPIO(51) # this will automatically be shared with TIM1_CH4
+    PE11 TIM1_CH2 TIM1 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PE9  TIM1_CH1 TIM1 PWM(4) GPIO(53) # this will automatically be shared with TIM1_CH1
+    PD13 TIM4_CH2 TIM4 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PD14 TIM4_CH3 TIM4 PWM(6) GPIO(55) BIDIR <-- BIDIR
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeOrangePlus-bdshot/hwdef.dat H7 cpu with BIDIR support
+  Board: CubeOrangePlus-bdshot
+  Total PWM outputs: 15
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PE14 TIM1_CH4 TIM1 PWM(1) GPIO(50)
+    PE13 TIM1_CH3 TIM1 PWM(2) GPIO(51)
+    PE11 TIM1_CH2 TIM1 PWM(3) GPIO(52)
+    PE9  TIM1_CH1 TIM1 PWM(4) GPIO(53)
+    PD13 TIM4_CH2 TIM4 PWM(5) GPIO(54)
+    PD14 TIM4_CH3 TIM4 PWM(6) GPIO(55)
+    PB4 PWM_VOLT_SEL OUTPUT HIGH GPIO(3)
+    define HAL_GPIO_PWM_VOLT_PIN 3
+    define HAL_GPIO_PWM_VOLT_3v3 1
+    PE14 TIM1_CH4 TIM1 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PE13 TIM1_CH3 TIM1 PWM(2) GPIO(51) # this will automatically be shared with TIM1_CH4
+    PE11 TIM1_CH2 TIM1 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PE9  TIM1_CH1 TIM1 PWM(4) GPIO(53) # this will automatically be shared with TIM1_CH1
+    PD13 TIM4_CH2 TIM4 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PD14 TIM4_CH3 TIM4 PWM(6) GPIO(55) BIDIR <-- BIDIR
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeRedPrimary-PPPGW/hwdef.dat H7 cpu with BIDIR support
+  Board: CubeRedPrimary-PPPGW
+  Total PWM outputs: 6
+  BIDIR outputs: 6
+
+  All PWM outputs:
+    PE11    TIM1_CH2    TIM1 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PE14    TIM1_CH4    TIM1 PWM(2) GPIO(51) BIDIR <-- BIDIR
+    PA15    TIM2_CH1    TIM2 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PA3    TIM2_CH4    TIM2 PWM(4) GPIO(53) BIDIR <-- BIDIR
+    PA6    TIM3_CH1    TIM3 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PB0    TIM3_CH3    TIM3 PWM(6) GPIO(55) BIDIR <-- BIDIR
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeRedPrimary/hwdef.dat H7 cpu with BIDIR support
+  Board: CubeRedPrimary
+  Total PWM outputs: 6
+  BIDIR outputs: 6
+
+  All PWM outputs:
+    PE11    TIM1_CH2    TIM1 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PE14    TIM1_CH4    TIM1 PWM(2) GPIO(51) BIDIR <-- BIDIR
+    PA15    TIM2_CH1    TIM2 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PA3    TIM2_CH4    TIM2 PWM(4) GPIO(53) BIDIR <-- BIDIR
+    PA6    TIM3_CH1    TIM3 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PB0    TIM3_CH3    TIM3 PWM(6) GPIO(55) BIDIR <-- BIDIR
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeRedSecondary/hwdef.dat H7 cpu with BIDIR support
+  Board: CubeRedSecondary
+  Total PWM outputs: 9
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PG1 PWM_VOLT_SEL OUTPUT HIGH GPIO(3)
+    PA8 TIM1_CH1 TIM1 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PA9 TIM1_CH2 TIM1 PWM(2) GPIO(51)
+    PA10 TIM1_CH3 TIM1 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PA11 TIM1_CH4 TIM1 PWM(4) GPIO(53)
+    PA5 TIM2_CH1 TIM2 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PA1 TIM2_CH2 TIM2 PWM(6) GPIO(55)
+    PB10 TIM2_CH3 TIM2 PWM(7) GPIO(56) BIDIR <-- BIDIR
+    PB11 TIM2_CH4 TIM2 PWM(8) GPIO(57)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Durandal-bdshot/hwdef.dat H7 cpu with BIDIR support
+  Board: Durandal-bdshot
+  Total PWM outputs: 12
+  BIDIR outputs: 2
+
+  All PWM outputs:
+    PE14 TIM1_CH4 TIM1 PWM(1) GPIO(50)
+    PA10 TIM1_CH3 TIM1 PWM(2) GPIO(51)
+    PE11 TIM1_CH2 TIM1 PWM(3) GPIO(52)
+    PE9  TIM1_CH1 TIM1 PWM(4) GPIO(53)
+    PD13 TIM4_CH2 TIM4 PWM(5) GPIO(54)
+    PD14 TIM4_CH3 TIM4 PWM(6) GPIO(55)
+    PH6  TIM12_CH1 TIM12 PWM(7) GPIO(56) NODMA
+    PH9  TIM12_CH2 TIM12 PWM(8) GPIO(57) NODMA
+    PE14 TIM1_CH4 TIM1 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PA10 TIM1_CH3 TIM1 PWM(2) GPIO(51)
+    PE11 TIM1_CH2 TIM1 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PE9  TIM1_CH1 TIM1 PWM(4) GPIO(53)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Here4FC/hwdef.dat H7 cpu with BIDIR support
+  Board: Here4FC
+  Total PWM outputs: 10
+  BIDIR outputs: 6
+
+  All PWM outputs:
+    PE9  TIM1_CH1 TIM1 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PE11 TIM1_CH2 TIM1 PWM(2) GPIO(51) # shared with channel 1
+    PE13 TIM1_CH3 TIM1 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PE14 TIM1_CH4 TIM1 PWM(4) GPIO(53) # shared with channel 3
+    PC7  TIM3_CH2 TIM3 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PC8  TIM3_CH3 TIM3 PWM(6) GPIO(55) BIDIR <-- BIDIR
+    PC9  TIM3_CH4 TIM3 PWM(7) GPIO(56) BIDIR <-- BIDIR
+    PA3  TIM2_CH4 TIM2 PWM(8) GPIO(57) BIDIR <-- BIDIR
+    PB8 TIM4_CH3 TIM4 PWM(9)
+    PB9 TIM4_CH4 TIM4 PWM(10)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/KakuteH7-Wing/hwdef.dat H7 cpu with BIDIR support
+  Board: KakuteH7-Wing
+  Total PWM outputs: 14
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PA8  TIM1_CH1   TIM1  PWM(1)  GPIO(50) BIDIR <-- BIDIR
+    PE11 TIM1_CH2   TIM1  PWM(2)  GPIO(51)
+    PE13 TIM1_CH3   TIM1  PWM(3)  GPIO(52) BIDIR <-- BIDIR
+    PE14 TIM1_CH4   TIM1  PWM(4)  GPIO(53)
+    PD14 TIM4_CH3   TIM4  PWM(5)  GPIO(54) BIDIR <-- BIDIR
+    PD15 TIM4_CH4   TIM4  PWM(6)  GPIO(55)
+    PA0  TIM5_CH1   TIM5  PWM(7)  GPIO(56) BIDIR <-- BIDIR
+    PA1  TIM5_CH2   TIM5  PWM(8)  GPIO(57)
+    PE5  TIM15_CH1  TIM15 PWM(9)  GPIO(58)
+    PE6  TIM15_CH2  TIM15 PWM(10) GPIO(59)
+    PB5  TIM3_CH2   TIM3  PWM(11) GPIO(60) NODMA
+    PB0  TIM3_CH3   TIM3  PWM(12) GPIO(61) NODMA
+    PB1  TIM3_CH4   TIM3  PWM(13) GPIO(62) NODMA
+    PA15 TIM2_CH1   TIM2  PWM(14) GPIO(63) NODMA
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/KakuteH7-bdshot/hwdef.dat H7 cpu with BIDIR support
+  Board: KakuteH7-bdshot
+  Total PWM outputs: 13
+  BIDIR outputs: 3
+
+  All PWM outputs:
+    PB0  TIM1_CH2N TIM1 PWM(1) GPIO(50)
+    PB1  TIM1_CH3N TIM1 PWM(2) GPIO(51)
+    PB3  TIM2_CH2  TIM2 PWM(3) GPIO(52)
+    PB10 TIM2_CH3  TIM2 PWM(4) GPIO(53)
+    PA0  TIM5_CH1  TIM5 PWM(5) GPIO(54)
+    PA2  TIM5_CH3  TIM5 PWM(6) GPIO(55)
+    PC8  TIM8_CH3  TIM8 PWM(7) GPIO(56)
+    PC9  TIM8_CH4  TIM8 PWM(8) GPIO(57)
+    PD12 TIM4_CH1 TIM4 PWM(9) GPIO(58)
+    PB0  TIM3_CH3 TIM3 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PB1  TIM3_CH4 TIM3 PWM(2) GPIO(51)
+    PB3  TIM2_CH2 TIM2 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PB10 TIM2_CH3 TIM2 PWM(4) GPIO(53) BIDIR <-- BIDIR
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/KakuteH7Mini-Nand/hwdef.dat H7 cpu with BIDIR support
+  Board: KakuteH7Mini-Nand
+  Total PWM outputs: 9
+  BIDIR outputs: 3
+
+  All PWM outputs:
+    PB0  TIM3_CH3 TIM3 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PB1  TIM3_CH4 TIM3 PWM(2) GPIO(51)
+    PB3  TIM2_CH2 TIM2 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PB10 TIM2_CH3 TIM2 PWM(4) GPIO(53) BIDIR <-- BIDIR
+    PA0  TIM5_CH1 TIM5 PWM(5) GPIO(54)
+    PA2  TIM5_CH3 TIM5 PWM(6) GPIO(55)
+    PC8  TIM8_CH3 TIM8 PWM(7) GPIO(56)
+    PC9  TIM8_CH4 TIM8 PWM(8) GPIO(57)
+    PD12 TIM4_CH1 TIM4 PWM(9) GPIO(58)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/KakuteH7Mini/hwdef.dat H7 cpu with BIDIR support
+  Board: KakuteH7Mini
+  Total PWM outputs: 9
+  BIDIR outputs: 3
+
+  All PWM outputs:
+    PB0  TIM3_CH3 TIM3 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PB1  TIM3_CH4 TIM3 PWM(2) GPIO(51)
+    PB3  TIM2_CH2 TIM2 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PB10 TIM2_CH3 TIM2 PWM(4) GPIO(53) BIDIR <-- BIDIR
+    PA0  TIM5_CH1 TIM5 PWM(5) GPIO(54)
+    PA2  TIM5_CH3 TIM5 PWM(6) GPIO(55)
+    PC8  TIM8_CH3 TIM8 PWM(7) GPIO(56)
+    PC9  TIM8_CH4 TIM8 PWM(8) GPIO(57)
+    PD12 TIM4_CH1 TIM4 PWM(9) GPIO(58)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/KakuteH7v2/hwdef.dat H7 cpu with BIDIR support
+  Board: KakuteH7v2
+  Total PWM outputs: 17
+  BIDIR outputs: 6
+
+  All PWM outputs:
+    PB0  TIM1_CH2N TIM1 PWM(1) GPIO(50)
+    PB1  TIM1_CH3N TIM1 PWM(2) GPIO(51)
+    PB3  TIM2_CH2  TIM2 PWM(3) GPIO(52)
+    PB10 TIM2_CH3  TIM2 PWM(4) GPIO(53)
+    PA0  TIM5_CH1  TIM5 PWM(5) GPIO(54)
+    PA2  TIM5_CH3  TIM5 PWM(6) GPIO(55)
+    PC8  TIM8_CH3  TIM8 PWM(7) GPIO(56)
+    PC9  TIM8_CH4  TIM8 PWM(8) GPIO(57)
+    PD12 TIM4_CH1 TIM4 PWM(9) GPIO(58)
+    PB0  TIM3_CH3 TIM3 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PB1  TIM3_CH4 TIM3 PWM(2) GPIO(51)
+    PB3  TIM2_CH2 TIM2 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PB10 TIM2_CH3 TIM2 PWM(4) GPIO(53) BIDIR <-- BIDIR
+    PA0  TIM5_CH1 TIM5 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PA2  TIM5_CH3 TIM5 PWM(6) GPIO(55) BIDIR <-- BIDIR
+    PC8  TIM8_CH3 TIM8 PWM(7) GPIO(56) BIDIR <-- BIDIR
+    PC9  TIM8_CH4 TIM8 PWM(8) GPIO(57)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MWD-Capella/hwdef.dat H7 cpu with BIDIR support
+  Board: MWD-Capella
+  Total PWM outputs: 8
+  BIDIR outputs: 2
+
+  All PWM outputs:
+    PE9  TIM1_CH1 TIM1 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PE11 TIM1_CH2 TIM1 PWM(2) GPIO(51)
+    PE13 TIM1_CH3 TIM1 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PE14 TIM1_CH4 TIM1 PWM(4) GPIO(53)
+    PA2  TIM2_CH3 TIM2 PWM(5) GPIO(54)
+    PA3  TIM2_CH4 TIM2 PWM(6) GPIO(55)
+    PD12 TIM4_CH1 TIM4 PWM(7) GPIO(56)
+    PD13 TIM4_CH2 TIM4 PWM(8) GPIO(57)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MambaH743v4/hwdef.dat H7 cpu with BIDIR support
+  Board: MambaH743v4
+  Total PWM outputs: 9
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PA0  TIM5_CH1 TIM5 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PA1  TIM5_CH2 TIM5 PWM(2) GPIO(51)
+    PA2  TIM5_CH3 TIM5 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PA3  TIM5_CH4 TIM5 PWM(4) GPIO(53)
+    PB0  TIM3_CH3 TIM3 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PB1  TIM3_CH4 TIM3 PWM(6) GPIO(55)
+    PC8  TIM8_CH3 TIM8 PWM(7) GPIO(56) BIDIR <-- BIDIR
+    PC9  TIM8_CH4 TIM8 PWM(8) GPIO(57)
+    PA8 TIM1_CH1 TIM1 PWM(9) GPIO(58)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekH743-bdshot/hwdef.dat H7 cpu with BIDIR support
+  Board: MatekH743-bdshot
+  Total PWM outputs: 25
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PB0  TIM8_CH2N TIM8  PWM(1)  GPIO(50)
+    PB1  TIM8_CH3N TIM8  PWM(2)  GPIO(51)
+    PA0  TIM5_CH1  TIM5  PWM(3)  GPIO(52)
+    PA1  TIM5_CH2  TIM5  PWM(4)  GPIO(53)
+    PA2  TIM5_CH3  TIM5  PWM(5)  GPIO(54)
+    PA3  TIM5_CH4  TIM5  PWM(6)  GPIO(55)
+    PD12 TIM4_CH1 TIM4 PWM(7) GPIO(56)
+    PD13 TIM4_CH2 TIM4 PWM(8) GPIO(57)
+    PD14 TIM4_CH3 TIM4 PWM(9) GPIO(58)
+    PD15 TIM4_CH4 TIM4 PWM(10) GPIO(59)
+    PE5  TIM15_CH1 TIM15 PWM(11) GPIO(60)
+    PE6  TIM15_CH2 TIM15 PWM(12) GPIO(61)
+    PA8 TIM1_CH1 TIM1 PWM(13) GPIO(62) # for WS2812 LED
+    PB0  TIM3_CH3 TIM3  PWM(1)  GPIO(50) BIDIR <-- BIDIR
+    PB1  TIM3_CH4 TIM3  PWM(2)  GPIO(51)
+    PA0  TIM2_CH1 TIM2  PWM(3)  GPIO(52) BIDIR <-- BIDIR
+    PA1  TIM2_CH2 TIM2  PWM(4)  GPIO(53)
+    PA2  TIM5_CH3 TIM5  PWM(5)  GPIO(54) BIDIR <-- BIDIR
+    PA3  TIM5_CH4 TIM5  PWM(6)  GPIO(55)
+    PD12 TIM4_CH1 TIM4  PWM(7)  GPIO(56) BIDIR <-- BIDIR
+    PD13 TIM4_CH2 TIM4  PWM(8)  GPIO(57)
+    PD14 TIM4_CH3 TIM4 PWM(9) GPIO(58) NODMA
+    PD15 TIM4_CH4 TIM4 PWM(10) GPIO(59) NODMA
+    PE5  TIM15_CH1 TIM15 PWM(11) GPIO(60) NODMA
+    PE6  TIM15_CH2 TIM15 PWM(12) GPIO(61) NODMA
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekH7A3/hwdef.dat H7 cpu with BIDIR support
+  Board: MatekH7A3
+  Total PWM outputs: 11
+  BIDIR outputs: 5
+
+  All PWM outputs:
+    PA9  TIM1_CH2  TIM1  PWM(1)  GPIO(50) BIDIR <-- BIDIR
+    PA10 TIM1_CH3  TIM1  PWM(2)  GPIO(51) BIDIR <-- BIDIR
+    PA15 TIM2_CH1  TIM2  PWM(3)  GPIO(52) BIDIR <-- BIDIR
+    PB3  TIM2_CH2  TIM2  PWM(4)  GPIO(53)
+    PB0  TIM3_CH3  TIM3  PWM(5)  GPIO(54) BIDIR <-- BIDIR
+    PB1  TIM3_CH4  TIM3  PWM(6)  GPIO(55)
+    PB4  TIM3_CH1  TIM3  PWM(7)  GPIO(56)
+    PB5  TIM3_CH2  TIM3  PWM(8)  GPIO(57) BIDIR <-- BIDIR
+    PB6  TIM4_CH1  TIM4  PWM(9)  GPIO(58)
+    PB7  TIM4_CH2  TIM4  PWM(10) GPIO(59)
+    PB8  TIM16_CH1 TIM16 PWM(11) GPIO(60)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MicoAir743-AIO/hwdef.dat H7 cpu with BIDIR support
+  Board: MicoAir743-AIO
+  Total PWM outputs: 10
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PE14 TIM1_CH4  TIM1  PWM(1)  GPIO(50) BIDIR <-- BIDIR
+    PE13 TIM1_CH3  TIM1  PWM(2)  GPIO(51)
+    PE11 TIM1_CH2  TIM1  PWM(3)  GPIO(52) BIDIR <-- BIDIR
+    PE9  TIM1_CH1  TIM1  PWM(4)  GPIO(53)
+    PB1  TIM3_CH4  TIM3  PWM(5)  GPIO(54) BIDIR <-- BIDIR
+    PB0  TIM3_CH3  TIM3  PWM(6)  GPIO(55)
+    PD12 TIM4_CH1  TIM4  PWM(7)  GPIO(56) BIDIR <-- BIDIR
+    PD13 TIM4_CH2  TIM4  PWM(8)  GPIO(57)
+    PD14 TIM4_CH3  TIM4  PWM(9)  GPIO(58) # M9
+    define BOARD_PWM_COUNT_DEFAULT 9
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MicoAir743/hwdef.dat H7 cpu with BIDIR support
+  Board: MicoAir743
+  Total PWM outputs: 11
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PE14 TIM1_CH4  TIM1  PWM(1)  GPIO(50) BIDIR <-- BIDIR
+    PE13 TIM1_CH3  TIM1  PWM(2)  GPIO(51)
+    PE11 TIM1_CH2  TIM1  PWM(3)  GPIO(52) BIDIR <-- BIDIR
+    PE9  TIM1_CH1  TIM1  PWM(4)  GPIO(53)
+    PB1  TIM3_CH4  TIM3  PWM(5)  GPIO(54) BIDIR <-- BIDIR
+    PB0  TIM3_CH3  TIM3  PWM(6)  GPIO(55)
+    PD12 TIM4_CH1  TIM4  PWM(7)  GPIO(56) BIDIR <-- BIDIR
+    PD13 TIM4_CH2  TIM4  PWM(8)  GPIO(57)
+    PD14 TIM4_CH3  TIM4  PWM(9)  GPIO(58)
+    PD15 TIM4_CH4  TIM4  PWM(10) GPIO(59)
+    define BOARD_PWM_COUNT_DEFAULT 10
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MicoAir743v2/hwdef.dat H7 cpu with BIDIR support
+  Board: MicoAir743v2
+  Total PWM outputs: 12
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PE14 TIM1_CH4  TIM1  PWM(1)  GPIO(50) BIDIR <-- BIDIR
+    PE13 TIM1_CH3  TIM1  PWM(2)  GPIO(51)
+    PE11 TIM1_CH2  TIM1  PWM(3)  GPIO(52) BIDIR <-- BIDIR
+    PE9  TIM1_CH1  TIM1  PWM(4)  GPIO(53)
+    PB1  TIM3_CH4  TIM3  PWM(5)  GPIO(54) BIDIR <-- BIDIR
+    PB0  TIM3_CH3  TIM3  PWM(6)  GPIO(55)
+    PD12 TIM4_CH1  TIM4  PWM(7)  GPIO(56) BIDIR <-- BIDIR
+    PD13 TIM4_CH2  TIM4  PWM(8)  GPIO(57)
+    PE5  TIM15_CH1 TIM15 PWM(9)  GPIO(58)
+    PE6  TIM15_CH2 TIM15 PWM(10) GPIO(59)
+    PD14 TIM4_CH3  TIM4  PWM(11) GPIO(60) #M11
+    define BOARD_PWM_COUNT_DEFAULT 11
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/NarinFC-H7/hwdef.dat H7 cpu with BIDIR support
+  Board: NarinFC-H7
+  Total PWM outputs: 14
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PH10 TIM5_CH1 TIM5 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PH11 TIM5_CH2 TIM5 PWM(2) GPIO(51)
+    PH12 TIM5_CH3 TIM5 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PI0  TIM5_CH4 TIM5 PWM(4) GPIO(53)
+    PD12 TIM4_CH1 TIM4 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PD13 TIM4_CH2 TIM4 PWM(6) GPIO(55)
+    PD14 TIM4_CH3 TIM4 PWM(7) GPIO(56) BIDIR <-- BIDIR
+    PD15 TIM4_CH4 TIM4 PWM(8) GPIO(57)
+    PE9  TIM1_CH1  TIM1  PWM(9)  GPIO(58)
+    PE11 TIM1_CH2  TIM1  PWM(10) GPIO(59)
+    PA10 TIM1_CH3  TIM1  PWM(11) GPIO(60)
+    PE14 TIM1_CH4  TIM1  PWM(12) GPIO(61)
+    PH6  TIM12_CH1 TIM12 PWM(13) GPIO(62) NODMA
+    PH9  TIM12_CH2 TIM12 PWM(14) GPIO(63) NODMA
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/NxtPX4v2/hwdef.dat H7 cpu with BIDIR support
+  Board: NxtPX4v2
+  Total PWM outputs: 8
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PE9  TIM1_CH1 TIM1  PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PE11 TIM1_CH2 TIM1  PWM(2) GPIO(51)
+    PE13 TIM1_CH3 TIM1  PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PE14 TIM1_CH4 TIM1  PWM(4) GPIO(53)
+    PB10 TIM2_CH3 TIM2  PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PB11 TIM2_CH4 TIM2  PWM(6) GPIO(55)
+    PB0  TIM3_CH3 TIM3  PWM(7) GPIO(56) BIDIR <-- BIDIR
+    PB1  TIM3_CH4 TIM3  PWM(8) GPIO(57)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/OrqaH7QuadCore/hwdef.dat H7 cpu with BIDIR support
+  Board: OrqaH7QuadCore
+  Total PWM outputs: 10
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PD12 TIM4_CH1 TIM4 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PD13 TIM4_CH2 TIM4 PWM(2) GPIO(51)
+    PA1  TIM2_CH2 TIM2 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PA0  TIM2_CH1 TIM2 PWM(4) GPIO(53)
+    PA2  TIM5_CH3 TIM5 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PA3  TIM5_CH4 TIM5 PWM(6) GPIO(55)
+    PB1  TIM3_CH4 TIM3 PWM(7) GPIO(56) BIDIR <-- BIDIR
+    PB0  TIM3_CH3 TIM3 PWM(8) GPIO(57)
+    PE6  TIM15_CH2 TIM15 PWM(9)  GPIO(58) NODMA
+    PE5  TIM15_CH1 TIM15 PWM(10) GPIO(59) NODMA
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/PixPilot-V6PRO/hwdef.dat H7 cpu with BIDIR support
+  Board: PixPilot-V6PRO
+  Total PWM outputs: 8
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PE14 TIM1_CH4 TIM1 PWM(1) GPIO(50)
+    PE13 TIM1_CH3 TIM1 PWM(2) GPIO(51) BIDIR <-- BIDIR
+    PE11 TIM1_CH2 TIM1 PWM(3) GPIO(52)
+    PE9  TIM1_CH1 TIM1 PWM(4) GPIO(53) BIDIR <-- BIDIR
+    PD13 TIM4_CH2 TIM4 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PD14 TIM4_CH3 TIM4 PWM(6) GPIO(55) BIDIR <-- BIDIR
+    PB0 TIM3_CH3 TIM3 PWM(7) GPIO(56)  NODMA
+    PB1 TIM3_CH4 TIM3 PWM(8) GPIO(57)  NODMA
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Pixhawk6C-bdshot/hwdef.dat H7 cpu with BIDIR support
+  Board: Pixhawk6C-bdshot
+  Total PWM outputs: 16
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PA8  TIM1_CH1 TIM1 PWM(1) GPIO(50)
+    PE11 TIM1_CH2 TIM1 PWM(2) GPIO(51)
+    PE13 TIM1_CH3 TIM1 PWM(3) GPIO(52)
+    PE14 TIM1_CH4 TIM1 PWM(4) GPIO(53)
+    PD14 TIM4_CH3 TIM4 PWM(5) GPIO(54)
+    PD15 TIM4_CH4 TIM4 PWM(6) GPIO(55)
+    PA0  TIM5_CH1 TIM5 PWM(7) GPIO(56)
+    PA1  TIM5_CH2 TIM5 PWM(8) GPIO(57)
+    PA8  TIM1_CH1 TIM1 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PE11 TIM1_CH2 TIM1 PWM(2) GPIO(51)
+    PE13 TIM1_CH3 TIM1 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PE14 TIM1_CH4 TIM1 PWM(4) GPIO(53)
+    PD14 TIM4_CH3 TIM4 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PD15 TIM4_CH4 TIM4 PWM(6) GPIO(55)
+    PA0  TIM5_CH1 TIM5 PWM(7) GPIO(56) BIDIR <-- BIDIR
+    PA1  TIM5_CH2 TIM5 PWM(8) GPIO(57)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Pixhawk6X-bdshot/hwdef.dat H7 cpu with BIDIR support
+  Board: Pixhawk6X-bdshot
+  Total PWM outputs: 14
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PI0  TIM5_CH4 TIM5 PWM(1) GPIO(50)
+    PH12 TIM5_CH3 TIM5 PWM(2) GPIO(51)
+    PH11 TIM5_CH2 TIM5 PWM(3) GPIO(52)
+    PH10 TIM5_CH1 TIM5 PWM(4) GPIO(53)
+    PD13 TIM4_CH2 TIM4 PWM(5) GPIO(54)
+    PD14 TIM4_CH3 TIM4 PWM(6) GPIO(55)
+    PH6  TIM12_CH1 TIM12 PWM(7) GPIO(56) NODMA
+    PH9  TIM12_CH2 TIM12 PWM(8) GPIO(57) NODMA
+    PI0  TIM5_CH4 TIM5 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PH12 TIM5_CH3 TIM5 PWM(2) GPIO(51)
+    PH11 TIM5_CH2 TIM5 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PH10 TIM5_CH1 TIM5 PWM(4) GPIO(53)
+    PD13 TIM4_CH2 TIM4 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PD14 TIM4_CH3 TIM4 PWM(6) GPIO(55) BIDIR <-- BIDIR
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/QioTekZealotH743-bdshot/hwdef.dat H7 cpu with BIDIR support
+  Board: QioTekZealotH743-bdshot
+  Total PWM outputs: 20
+  BIDIR outputs: 3
+
+  All PWM outputs:
+    PA2  TIM5_CH3 TIM5 PWM(1) GPIO(50)
+    PA3  TIM5_CH4 TIM5 PWM(2) GPIO(51)
+    PB0  TIM3_CH3 TIM3 PWM(3) GPIO(52)
+    PC9  TIM3_CH4 TIM3 PWM(4) GPIO(53)
+    PE9  TIM1_CH1 TIM1 PWM(5) GPIO(54)
+    PE11 TIM1_CH2 TIM1 PWM(6) GPIO(55)
+    PE13 TIM1_CH3 TIM1 PWM(7) GPIO(56)
+    PE14 TIM1_CH4 TIM1 PWM(8) GPIO(57)
+    PD12 TIM4_CH1 TIM4 PWM(9)  GPIO(58)
+    PD13 TIM4_CH2 TIM4 PWM(10) GPIO(59)
+    PD14 TIM4_CH3 TIM4 PWM(11) GPIO(60)
+    PD15 TIM4_CH4 TIM4 PWM(12) GPIO(61)
+    PC6  TIM3_CH1 TIM3 PWM(13) GPIO(62) NODMA
+    PC7  TIM3_CH2 TIM3 PWM(14) GPIO(63) NODMA
+    PD12 TIM4_CH1 TIM4 PWM(9)  GPIO(58) BIDIR <-- BIDIR
+    PD13 TIM4_CH2 TIM4 PWM(10) GPIO(59)
+    PD14 TIM4_CH3 TIM4 PWM(11) GPIO(60) BIDIR <-- BIDIR
+    PD15 TIM4_CH4 TIM4 PWM(12) GPIO(61)
+    PC6  TIM3_CH1 TIM3 PWM(13) GPIO(62) BIDIR <-- BIDIR
+    PC7  TIM3_CH2 TIM3 PWM(14) GPIO(63)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/SDMODELH7V2/hwdef.dat H7 cpu with BIDIR support
+  Board: SDMODELH7V2
+  Total PWM outputs: 13
+  BIDIR outputs: 3
+
+  All PWM outputs:
+    PB0  TIM1_CH2N TIM1 PWM(1) GPIO(50)
+    PB1  TIM1_CH3N TIM1 PWM(2) GPIO(51)
+    PB3  TIM2_CH2  TIM2 PWM(3) GPIO(52)
+    PB10 TIM2_CH3  TIM2 PWM(4) GPIO(53)
+    PA0  TIM5_CH1  TIM5 PWM(5) GPIO(54)
+    PA2  TIM5_CH3  TIM5 PWM(6) GPIO(55)
+    PC8  TIM8_CH3  TIM8 PWM(7) GPIO(56)
+    PC9  TIM8_CH4  TIM8 PWM(8) GPIO(57)
+    PD12 TIM4_CH1 TIM4 PWM(9) GPIO(58)
+    PB0  TIM3_CH3 TIM3 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PB1  TIM3_CH4 TIM3 PWM(2) GPIO(51)
+    PB3  TIM2_CH2 TIM2 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PB10 TIM2_CH3 TIM2 PWM(4) GPIO(53) BIDIR <-- BIDIR
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/SVehicle-E2/hwdef.dat H7 cpu with BIDIR support
+  Board: SVehicle-E2
+  Total PWM outputs: 11
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PI0  TIM5_CH4 TIM5 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PH12 TIM5_CH3 TIM5 PWM(2) GPIO(51)
+    PH11 TIM5_CH2 TIM5 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PH10 TIM5_CH1 TIM5 PWM(4) GPIO(53)
+    PD13 TIM4_CH2 TIM4 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PD14 TIM4_CH3 TIM4 PWM(6) GPIO(55) BIDIR <-- BIDIR
+    PH6  TIM12_CH1 TIM12 PWM(7) GPIO(56) NODMA
+    PH9  TIM12_CH2 TIM12 PWM(8) GPIO(57) NODMA
+    PG6 PWM_VOLT_SEL OUTPUT HIGH GPIO(81)
+    define HAL_GPIO_PWM_VOLT_PIN 81
+    define HAL_GPIO_PWM_VOLT_3v3 1
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/SkySakuraH743/hwdef.dat H7 cpu with BIDIR support
+  Board: SkySakuraH743
+  Total PWM outputs: 13
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PA2 TIM5_CH3 TIM5 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PA3 TIM5_CH4 TIM5 PWM(2) GPIO(51)
+    PB1 TIM3_CH4 TIM3 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PB0 TIM3_CH3 TIM3 PWM(4) GPIO(53)
+    PA1 TIM2_CH2 TIM2 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PA0 TIM2_CH1 TIM2 PWM(6) GPIO(55)
+    PE5 TIM15_CH1 TIM15 PWM(7) GPIO(56) BIDIR <-- BIDIR
+    PE6 TIM15_CH2 TIM15 PWM(8) GPIO(57)
+    PD12 TIM4_CH1 TIM4 PWM(9) GPIO(58) NODMA
+    PD13 TIM4_CH2 TIM4 PWM(10) GPIO(59) NODMA
+    PD14 TIM4_CH3 TIM4 PWM(11) GPIO(60) NODMA
+    PD15 TIM4_CH4 TIM4 PWM(12) GPIO(61) NODMA
+    PA8 TIM1_CH1 TIM1 PWM(13) GPIO(62) # for WS2812 LED
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/SkystarsH7HD-bdshot/hwdef.dat H7 cpu with BIDIR support
+  Board: SkystarsH7HD-bdshot
+  Total PWM outputs: 14
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PB0  TIM1_CH2N TIM1 PWM(1) GPIO(50)
+    PB1  TIM1_CH3N TIM1 PWM(2) GPIO(51)
+    PD12 TIM4_CH1  TIM4 PWM(3) GPIO(52)
+    PD13 TIM4_CH2  TIM4 PWM(4) GPIO(53)
+    PA0  TIM2_CH1  TIM2 PWM(5) GPIO(54)
+    PA1  TIM2_CH2  TIM2 PWM(6) GPIO(55)
+    PA2  TIM2_CH3  TIM2 PWM(7) GPIO(56)
+    PA3  TIM2_CH4  TIM2 PWM(8) GPIO(57)
+    PA8  TIM1_CH1  TIM1 PWM(9) GPIO(58)
+    PB0  TIM3_CH3 TIM3 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PB1  TIM3_CH4 TIM3 PWM(2) GPIO(51)
+    PD12 TIM4_CH1 TIM4 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PA0  TIM2_CH1 TIM2 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PA2  TIM2_CH3 TIM2 PWM(7) GPIO(56) BIDIR <-- BIDIR
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/SkystarsH7HDv2/hwdef.dat H7 cpu with BIDIR support
+  Board: SkystarsH7HDv2
+  Total PWM outputs: 18
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PB0  TIM1_CH2N TIM1 PWM(1) GPIO(50)
+    PB1  TIM1_CH3N TIM1 PWM(2) GPIO(51)
+    PD12 TIM4_CH1  TIM4 PWM(3) GPIO(52)
+    PD13 TIM4_CH2  TIM4 PWM(4) GPIO(53)
+    PA0  TIM2_CH1  TIM2 PWM(5) GPIO(54)
+    PA1  TIM2_CH2  TIM2 PWM(6) GPIO(55)
+    PA2  TIM2_CH3  TIM2 PWM(7) GPIO(56)
+    PA3  TIM2_CH4  TIM2 PWM(8) GPIO(57)
+    PA8  TIM1_CH1  TIM1 PWM(9) GPIO(58)
+    PB0  TIM3_CH3 TIM3 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PB1  TIM3_CH4 TIM3 PWM(2) GPIO(51)
+    PD12 TIM4_CH1 TIM4 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PA0  TIM2_CH1 TIM2 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PA2  TIM2_CH3 TIM2 PWM(7) GPIO(56) BIDIR <-- BIDIR
+    PA0 TIM5_CH1 TIM5 PWM(5) GPIO(54) BIDIR # M5
+    PA1 TIM5_CH2 TIM5 PWM(6) GPIO(55)       # M6
+    PA2 TIM5_CH3 TIM5 PWM(7) GPIO(56) BIDIR # M7
+    PA3 TIM5_CH4 TIM5 PWM(8) GPIO(57)       # M8
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/TBS_LUCID_H7/hwdef.dat H7 cpu with BIDIR support
+  Board: TBS_LUCID_H7
+  Total PWM outputs: 13
+  BIDIR outputs: 5
+
+  All PWM outputs:
+    PB0  TIM3_CH3 TIM3 PWM(1)  GPIO(50) BIDIR <-- BIDIR
+    PB1  TIM3_CH4 TIM3 PWM(2)  GPIO(51)
+    PA0  TIM2_CH1 TIM2 PWM(3)  GPIO(52) BIDIR <-- BIDIR
+    PA1  TIM2_CH2 TIM2 PWM(4)  GPIO(53)
+    PA2  TIM5_CH3 TIM5 PWM(5)  GPIO(54) BIDIR <-- BIDIR
+    PA3  TIM5_CH4 TIM5 PWM(6)  GPIO(55)
+    PD12 TIM4_CH1 TIM4 PWM(7)  GPIO(56) BIDIR <-- BIDIR
+    PD13 TIM4_CH2 TIM4 PWM(8)  GPIO(57)
+    PD14 TIM4_CH3 TIM4 PWM(9)  GPIO(58) BIDIR <-- BIDIR
+    PD15 TIM4_CH4 TIM4 PWM(10) GPIO(59)
+    PE5  TIM15_CH1 TIM15 PWM(11) GPIO(60) NODMA
+    PE6  TIM15_CH2 TIM15 PWM(12) GPIO(61) NODMA
+    PA8 TIM1_CH1 TIM1 PWM(13) GPIO(62) # for WS2812 LED
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/TBS_LUCID_H7_WING/hwdef.dat H7 cpu with BIDIR support
+  Board: TBS_LUCID_H7_WING
+  Total PWM outputs: 13
+  BIDIR outputs: 5
+
+  All PWM outputs:
+    PB0  TIM3_CH3 TIM3 PWM(1)  GPIO(50) BIDIR <-- BIDIR
+    PB1  TIM3_CH4 TIM3 PWM(2)  GPIO(51)
+    PA0  TIM2_CH1 TIM2 PWM(3)  GPIO(52) BIDIR <-- BIDIR
+    PA1  TIM2_CH2 TIM2 PWM(4)  GPIO(53)
+    PA2  TIM5_CH3 TIM5 PWM(5)  GPIO(54) BIDIR <-- BIDIR
+    PA3  TIM5_CH4 TIM5 PWM(6)  GPIO(55)
+    PD12 TIM4_CH1 TIM4 PWM(7)  GPIO(56) BIDIR <-- BIDIR
+    PD13 TIM4_CH2 TIM4 PWM(8)  GPIO(57)
+    PD14 TIM4_CH3 TIM4 PWM(9)  GPIO(58) BIDIR <-- BIDIR
+    PD15 TIM4_CH4 TIM4 PWM(10) GPIO(59)
+    PE5  TIM15_CH1 TIM15 PWM(11) GPIO(60) NODMA
+    PE6  TIM15_CH2 TIM15 PWM(12) GPIO(61) NODMA
+    PA8 TIM1_CH1 TIM1 PWM(13) GPIO(62) # for WS2812 LED
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/TBS_LUCID_H7_WING_AIO/hwdef.dat H7 cpu with BIDIR support
+  Board: TBS_LUCID_H7_WING_AIO
+  Total PWM outputs: 13
+  BIDIR outputs: 5
+
+  All PWM outputs:
+    PB0  TIM3_CH3 TIM3 PWM(1)  GPIO(50) BIDIR <-- BIDIR
+    PB1  TIM3_CH4 TIM3 PWM(2)  GPIO(51)
+    PA0  TIM2_CH1 TIM2 PWM(3)  GPIO(52) BIDIR <-- BIDIR
+    PA1  TIM2_CH2 TIM2 PWM(4)  GPIO(53)
+    PA2  TIM5_CH3 TIM5 PWM(5)  GPIO(54) BIDIR <-- BIDIR
+    PA3  TIM5_CH4 TIM5 PWM(6)  GPIO(55)
+    PD12 TIM4_CH1 TIM4 PWM(7)  GPIO(56) BIDIR <-- BIDIR
+    PD13 TIM4_CH2 TIM4 PWM(8)  GPIO(57)
+    PD14 TIM4_CH3 TIM4 PWM(9)  GPIO(58) BIDIR <-- BIDIR
+    PD15 TIM4_CH4 TIM4 PWM(10) GPIO(59)
+    PE5  TIM15_CH1 TIM15 PWM(11) GPIO(60) NODMA
+    PE6  TIM15_CH2 TIM15 PWM(12) GPIO(61) NODMA
+    PA8 TIM1_CH1 TIM1 PWM(13) GPIO(62) # for WS2812 LED
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/VUAV-V7pro/hwdef.dat H7 cpu with BIDIR support
+  Board: VUAV-V7pro
+  Total PWM outputs: 14
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PA15 TIM2_CH1 TIM2 PWM(1) GPIO(50)   BIDIR <-- BIDIR
+    PB3  TIM2_CH2 TIM2 PWM(2) GPIO(51)
+    PB10 TIM2_CH3 TIM2 PWM(3) GPIO(52)   BIDIR <-- BIDIR
+    PA3  TIM2_CH4 TIM2 PWM(4) GPIO(53)
+    PK1  TIM1_CH1 TIM1 PWM(5) GPIO(54)   BIDIR <-- BIDIR
+    PE11 TIM1_CH2 TIM1 PWM(6) GPIO(55)
+    PJ9  TIM1_CH3 TIM1 PWM(7) GPIO(56)   BIDIR <-- BIDIR
+    PE14 TIM1_CH4 TIM1 PWM(8) GPIO(57)
+    PD12 TIM4_CH1 TIM4 PWM(9)  GPIO(58)
+    PD13 TIM4_CH2 TIM4 PWM(10) GPIO(59)
+    PD14 TIM4_CH3 TIM4 PWM(11) GPIO(60)
+    PD15 TIM4_CH4 TIM4 PWM(12) GPIO(61)
+    PH6  TIM12_CH1 TIM12 PWM(13) GPIO(62) NODMA
+    PH9  TIM12_CH2 TIM12 PWM(14) GPIO(63) NODMA
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/X-MAV-AP-H743v2/hwdef.dat H7 cpu with BIDIR support
+  Board: X-MAV-AP-H743v2
+  Total PWM outputs: 8
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PE9  TIM1_CH1 TIM1  PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PE11 TIM1_CH2 TIM1  PWM(2) GPIO(51)
+    PE13 TIM1_CH3 TIM1  PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PE14 TIM1_CH4 TIM1  PWM(4) GPIO(53)
+    PB1  TIM3_CH4 TIM3  PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PB0  TIM3_CH3 TIM3  PWM(6) GPIO(55)
+    PB10 TIM2_CH3 TIM2  PWM(7) GPIO(56) BIDIR <-- BIDIR
+    PB11 TIM2_CH4 TIM2  PWM(8) GPIO(57)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/YJUAV_A6/hwdef.dat H7 cpu with BIDIR support
+  Board: YJUAV_A6
+  Total PWM outputs: 14
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PE9  TIM1_CH1  TIM1 PWM(1)  GPIO(50)    BIDIR <-- BIDIR
+    PE11 TIM1_CH2  TIM1 PWM(2)  GPIO(51)
+    PE13 TIM1_CH3  TIM1 PWM(3)  GPIO(52)    BIDIR <-- BIDIR
+    PE14 TIM1_CH4  TIM1 PWM(4)  GPIO(53)
+    PA15 TIM2_CH1  TIM2 PWM(5)  GPIO(54)    BIDIR <-- BIDIR
+    PA1  TIM2_CH2  TIM2 PWM(6)  GPIO(55)
+    PA2  TIM2_CH3  TIM2 PWM(7)  GPIO(56)    BIDIR <-- BIDIR
+    PA3  TIM2_CH4  TIM2 PWM(8)  GPIO(57)
+    PC6  TIM3_CH1  TIM3 PWM(9)  GPIO(58)
+    PA7  TIM3_CH2  TIM3 PWM(10) GPIO(59)
+    PB0  TIM3_CH3  TIM3 PWM(11) GPIO(60)
+    PB1  TIM3_CH4  TIM3 PWM(12) GPIO(61)
+    PD14 TIM4_CH3  TIM4 PWM(13) GPIO(62)    NODMA
+    PD15 TIM4_CH4  TIM4 PWM(14) GPIO(63)    NODMA
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/YJUAV_A6SE/hwdef.dat H7 cpu with BIDIR support
+  Board: YJUAV_A6SE
+  Total PWM outputs: 11
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PA15  TIM2_CH1  TIM2 PWM(1)  GPIO(50)   BIDIR <-- BIDIR
+    PA1   TIM2_CH2  TIM2 PWM(2)  GPIO(51)
+    PA2   TIM2_CH3  TIM2 PWM(3)  GPIO(52)   BIDIR <-- BIDIR
+    PA3   TIM2_CH4  TIM2 PWM(4)  GPIO(53)
+    PA8   TIM1_CH1  TIM1 PWM(5)  GPIO(54)	BIDIR <-- BIDIR
+    PE11  TIM1_CH2  TIM1 PWM(6)  GPIO(55)
+    PA10  TIM1_CH3  TIM1 PWM(7)  GPIO(56)	BIDIR <-- BIDIR
+    PE14  TIM1_CH4  TIM1 PWM(8)  GPIO(57)
+    PB5   TIM3_CH2  TIM3 PWM(9)  GPIO(58)
+    PB0   TIM3_CH3  TIM3 PWM(10) GPIO(59)
+    PB1   TIM3_CH4  TIM3 PWM(11) GPIO(60)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/YJUAV_A6SE_H743/hwdef.dat H7 cpu with BIDIR support
+  Board: YJUAV_A6SE_H743
+  Total PWM outputs: 11
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PA15  TIM2_CH1  TIM2 PWM(1)  GPIO(50)   BIDIR <-- BIDIR
+    PA1   TIM2_CH2  TIM2 PWM(2)  GPIO(51)
+    PA2   TIM2_CH3  TIM2 PWM(3)  GPIO(52)   BIDIR <-- BIDIR
+    PA3   TIM2_CH4  TIM2 PWM(4)  GPIO(53)
+    PA8   TIM1_CH1  TIM1 PWM(5)  GPIO(54)	BIDIR <-- BIDIR
+    PE11  TIM1_CH2  TIM1 PWM(6)  GPIO(55)
+    PA10  TIM1_CH3  TIM1 PWM(7)  GPIO(56)	BIDIR <-- BIDIR
+    PE14  TIM1_CH4  TIM1 PWM(8)  GPIO(57)
+    PB5   TIM3_CH2  TIM3 PWM(9)  GPIO(58)
+    PB0   TIM3_CH3  TIM3 PWM(10) GPIO(59)
+    PB1   TIM3_CH4  TIM3 PWM(11) GPIO(60)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/YJUAV_A6Ultra/hwdef.dat H7 cpu with BIDIR support
+  Board: YJUAV_A6Ultra
+  Total PWM outputs: 13
+  BIDIR outputs: 4
+
+  All PWM outputs:
+    PA15  TIM2_CH1  TIM2 PWM(1)  GPIO(50)   BIDIR <-- BIDIR
+    PA1   TIM2_CH2  TIM2 PWM(2)  GPIO(51)
+    PA2   TIM2_CH3  TIM2 PWM(3)  GPIO(52)   BIDIR <-- BIDIR
+    PA3   TIM2_CH4  TIM2 PWM(4)  GPIO(53)
+    PA8   TIM1_CH1  TIM1 PWM(5)  GPIO(54)	BIDIR <-- BIDIR
+    PE11  TIM1_CH2  TIM1 PWM(6)  GPIO(55)
+    PA10  TIM1_CH3  TIM1 PWM(7)  GPIO(56)	BIDIR <-- BIDIR
+    PE14  TIM1_CH4  TIM1 PWM(8)  GPIO(57)
+    PB5   TIM3_CH2  TIM3 PWM(9)  GPIO(58)
+    PB0   TIM3_CH3  TIM3 PWM(10) GPIO(59)
+    PB1   TIM3_CH4  TIM3 PWM(11) GPIO(60)
+    PH6   TIM12_CH1 TIM12 PWM(12) GPIO(61) NODMA
+    PH9   TIM12_CH2 TIM12 PWM(13) GPIO(62) NODMA
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/mRoCZeroOEMH7-bdshot/hwdef.dat H7 cpu with BIDIR support
+  Board: mRoCZeroOEMH7-bdshot
+  Total PWM outputs: 16
+  BIDIR outputs: 5
+
+  All PWM outputs:
+    PE14 TIM1_CH4 TIM1 PWM(1) GPIO(50)
+    PE13 TIM1_CH3 TIM1 PWM(2) GPIO(51)
+    PE11 TIM1_CH2 TIM1 PWM(3) GPIO(52)
+    PE9  TIM1_CH1 TIM1 PWM(4) GPIO(53)
+    PD13 TIM4_CH2 TIM4 PWM(5) GPIO(54)
+    PD14 TIM4_CH3 TIM4 PWM(6) GPIO(55)
+    PI5  TIM8_CH1 TIM8 PWM(7) GPIO(56)
+    PI6  TIM8_CH2 TIM8 PWM(8) GPIO(57)
+    PE14 TIM1_CH4 TIM1 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PE13 TIM1_CH3 TIM1 PWM(2) GPIO(51)
+    PE11 TIM1_CH2 TIM1 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PE9  TIM1_CH1 TIM1 PWM(4) GPIO(53)
+    PD13 TIM4_CH2 TIM4 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PD14 TIM4_CH3 TIM4 PWM(6) GPIO(55) BIDIR <-- BIDIR
+    PI5  TIM8_CH1 TIM8 PWM(7) GPIO(56) BIDIR <-- BIDIR
+    PI6  TIM8_CH2 TIM8 PWM(8) GPIO(57)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/mRoControlZeroH7-bdshot/hwdef.dat H7 cpu with BIDIR support
+  Board: mRoControlZeroH7-bdshot
+  Total PWM outputs: 16
+  BIDIR outputs: 5
+
+  All PWM outputs:
+    PE14 TIM1_CH4 TIM1 PWM(1) GPIO(50)
+    PE13 TIM1_CH3 TIM1 PWM(2) GPIO(51)
+    PE11 TIM1_CH2 TIM1 PWM(3) GPIO(52)
+    PE9  TIM1_CH1 TIM1 PWM(4) GPIO(53)
+    PD13 TIM4_CH2 TIM4 PWM(5) GPIO(54)
+    PD14 TIM4_CH3 TIM4 PWM(6) GPIO(55)
+    PI5  TIM8_CH1 TIM8 PWM(7) GPIO(56)
+    PI6  TIM8_CH2 TIM8 PWM(8) GPIO(57)
+    PE14 TIM1_CH4 TIM1 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PE13 TIM1_CH3 TIM1 PWM(2) GPIO(51)
+    PE11 TIM1_CH2 TIM1 PWM(3) GPIO(52) BIDIR <-- BIDIR
+    PE9  TIM1_CH1 TIM1 PWM(4) GPIO(53)
+    PD13 TIM4_CH2 TIM4 PWM(5) GPIO(54) BIDIR <-- BIDIR
+    PD14 TIM4_CH3 TIM4 PWM(6) GPIO(55) BIDIR <-- BIDIR
+    PI5  TIM8_CH1 TIM8 PWM(7) GPIO(56) BIDIR <-- BIDIR
+    PI6  TIM8_CH2 TIM8 PWM(8) GPIO(57)
+
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/mRoPixracerPro-bdshot/hwdef.dat H7 cpu with BIDIR support
+  Board: mRoPixracerPro-bdshot
+  Total PWM outputs: 13
+  BIDIR outputs: 2
+
+  All PWM outputs:
+    PE14 TIM1_CH4 TIM1 PWM(1) GPIO(50)
+    PE13 TIM1_CH3 TIM1 PWM(2) GPIO(51)
+    PE11 TIM1_CH2 TIM1 PWM(3) GPIO(52)
+    PE9  TIM1_CH1 TIM1 PWM(4) GPIO(53)
+    PD13 TIM4_CH2 TIM4 PWM(5) GPIO(54)
+    PD14 TIM4_CH3 TIM4 PWM(6) GPIO(55)
+    PI5  TIM8_CH1 TIM8 PWM(7) GPIO(56)
+    PI6  TIM8_CH2 TIM8 PWM(8) GPIO(57)
+    PG6 PWM_VOLT_SEL OUTPUT LOW GPIO(74)
+    define HAL_GPIO_PWM_VOLT_PIN 74
+    define HAL_GPIO_PWM_VOLT_3v3 0
+    PE14 TIM1_CH4 TIM1 PWM(1) GPIO(50) BIDIR <-- BIDIR
+    PE9  TIM1_CH1 TIM1 PWM(4) GPIO(53) BIDIR <-- BIDIR
+
+================================================================================
+RESULTS - NOT H7 MCU
+================================================================================
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/ACNS-CM4Pilot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/ACNS-F405AIO/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/AIRLink/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/AR-F407SmartBat/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/ARK_CANNODE/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/ARK_GPS/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/ARK_RTK_GPS/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/AeroFox-Airspeed-DLVR/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/AeroFox-Airspeed/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/AeroFox-GNSS_F9P/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/AeroFox-PMU/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/AtomRCF405NAVI/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/BETAFPV-F405-I2C/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/BETAFPV-F405/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/BOTWINGF405/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/BROTHERHOBBYF405v3/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/BeastF7/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/BeastF7v2/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/BirdCANdy/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/BlitzF745/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/BlitzF745AIO/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/BlitzMiniF745/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/BrahmaF4/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/C-RTK2-HP/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CSKY405/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CUAV-Pixhack-v3/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CUAV_GPS/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CUAVv5-bdshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CUAVv5/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CUAVv5Nano-bdshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CUAVv5Nano/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CarbonixF405/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CarbonixL496/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeBlack+/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeBlack-periph/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeBlack/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeGreen-solo/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubePurple/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeSolo/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeYellow-bdshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeYellow/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/DrotekP3Pro/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/F35Lightning/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/F4BY/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/FlyingMoonF407/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/FlyingMoonF427/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/FlywooF405HD-AIOv2/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/FlywooF405Pro/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/FlywooF405S-AIO/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/FlywooF745/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/FlywooF745Nano/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/FoxeerF405v2/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/FreeflyRTK/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/G4-ESC/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/GEPRCF745BTHD/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/HEEWING-F405/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/HEEWING-F405v2/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Hitec-Airspeed/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/HitecMosaic/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/HolybroF4_PMU/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/HolybroG4_Airspeed/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/HolybroG4_Compass/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/HolybroG4_GPS/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/HolybroGPS/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/JFB100/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/JHEMCU-GSF405A-RX2/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/JHEMCU-GSF405A/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/JHEM_JHEF405/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/KakuteF4-Wing/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/KakuteF4/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/KakuteF4Mini/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/KakuteF7-bdshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/KakuteF7/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/KakuteF7Mini/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/LongBowF405WING/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MUPilot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MambaF405-2022/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MambaF405US-I2C/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MambaF405v2/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekF405-CAN/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekF405-STD/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekF405-TE-bdshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekF405-TE/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekF405-Wing-bdshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekF405-Wing/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekF405-bdshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekF405/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekF765-SE/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekF765-Wing-bdshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekF765-Wing/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekG474-DShot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekG474-Periph/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekL431-ADSB/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekL431-APDTelem/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekL431-Airspeed/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekL431-BattMon/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekL431-DShot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekL431-EFI/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekL431-GPS/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekL431-HWTelem/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekL431-MagHiRes/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekL431-Periph/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekL431-Proximity/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekL431-RC/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekL431-Rangefinder/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekL431-Serial/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekL431-bdshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MazzyStarDrone/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MicoAir405Mini/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MicoAir405v2/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Nucleo-G491/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Nucleo-L476/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Nucleo-L496/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/OMNIBUSF7V2/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/OmnibusNanoV6-bdshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/OmnibusNanoV6/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/OrqaF405Pro/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/PH4-mini-bdshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/PH4-mini/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Pix32v5/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/PixFlamingo-F767/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/PixFlamingo/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/PixPilot-C3/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/PixPilot-V3/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/PixSurveyA1-IND/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/PixSurveyA1/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Pixhawk1-1M-bdshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Pixhawk1-1M/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Pixhawk1-bdshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Pixhawk1/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Pixhawk4-bdshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Pixhawk4/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Pixhawk5X/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Pixracer-bdshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Pixracer-periph/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Pixracer/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/QioTekAdeptF407/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/QioTekZealotF427/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/R9Pilot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/RadiolinkF405/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/RadiolinkPIX6/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/ReaperF745/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/SDMODELH7V1/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/SPEDIXF405/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Sierra-F405/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Sierra-F412/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Sierra-F9P/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Sierra-L431/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Sierra-PrecisionPoint/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Sierra-TrueNavIC/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Sierra-TrueNavPro-G4/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Sierra-TrueNavPro/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Sierra-TrueNorth/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Sierra-TrueSpeed/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/SkystarsF405v2/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/SpeedyBeeF405AIO/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/SpeedyBeeF405Mini/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/SpeedyBeeF405WING/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/SuccexF4/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Swan-K1/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/TBS-Colibri-F7/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/TBS_LUCID_PRO/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/VRBrain-v51/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/VRBrain-v52/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/VRBrain-v54/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/VRCore-v10/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/VRUBrain-v51/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/ZubaxGNSS/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/airbotf4/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/cmcopter/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/crazyflie2/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/f103-ADSB/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/f103-Airspeed/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/f103-GPS/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/f103-HWESC/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/f103-QiotekPeriph/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/f103-RangeFinder/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/f103-Trigger/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/f303-GPS/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/f303-HWESC/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/f303-M10025/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/f303-M10070/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/f303-MatekGPS/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/f303-PWM/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/f303-TempSensor/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/f303-Universal/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/f405-MatekAirspeed/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/f405-MatekGPS/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/fmuv2/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/fmuv3-bdshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/fmuv3/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/fmuv5/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/iomcu-dshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/iomcu-f103-8MHz-dshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/iomcu-f103-dshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/iomcu-f103/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/iomcu/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/iomcu_f103_8MHz/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/luminousbee4/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/mRo-M10095/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/mRoCANPWM-M10126/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/mRoControlZeroF7/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/mRoKitCANrevC/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/mRoX21-777/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/mRoX21/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/mindpx-v2/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/mini-pix/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/modalai_fc-v1/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/omnibusf4/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/omnibusf4pro-bdshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/omnibusf4pro-one/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/omnibusf4pro/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/omnibusf4v6/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/rGNSS/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/revo-mini-bdshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/revo-mini-i2c-bdshot/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/revo-mini-i2c/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/revo-mini-sd/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/revo-mini/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/skyviper-f412-rev1/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/skyviper-journey/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/skyviper-v2450/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/sparky2/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/speedybeef4/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/speedybeef4v3/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/speedybeef4v4/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/sw-boom-f407/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/sw-nav-f405/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/sw-spar-f407/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/thepeach-k1/hwdef.dat Not H7 MCU
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/thepeach-r1/hwdef.dat Not H7 MCU
+
+================================================================================
+RESULTS - NO BIDIR SUPPORT
+================================================================================
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/AET-H743-Basic/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/ARKV6X/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Aocoda-RC-H743Dual/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/BeastH7/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/BeastH7v2/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/BlitzH743Pro/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/BlitzWingH743/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/BotBloxDroneNet/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CUAV-Nora-ODID/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CUAV-Nora/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CUAV-X7-ODID/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CUAV-X7/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeNode-ETH/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeNode/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeOrange-ODID/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeOrange-SimOnHardWare/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeOrange-joey/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeOrange-periph-heavy/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeOrange-periph/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeOrange/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeOrangePlus-SimOnHardWare/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/CubeOrangePlus/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/DAKEFPVH743/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/DAKEFPVH743Pro/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/DevEBoxH7v2/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Durandal/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/FlyingMoonH743/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/FlywooH743Pro/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/FoxeerH743v1/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/GEPRC_TAKER_H743/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/H757I_EVAL/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/H757I_EVAL_intf/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Here4AP/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/IFLIGHT_2RAW_H7/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/JFB110/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/JHEMCU-H743HD/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/KakuteH7/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MFT-SEMA100/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekH743-periph/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/MatekH743/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/NucleoH743/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/NucleoH755/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/PixC4-Jetson/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/PixPilot-V6/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/PixSurveyA2/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Pixhawk6C/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Pixhawk6X-ODID/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Pixhawk6X-PPPGW/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/Pixhawk6X/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/QioTekZealotH743/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/RADIX2HD/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/SIYI_N7/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/SPEDIXH743/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/SPRacingH7/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/SPRacingH7RF/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/SequreH743/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/SkystarsH7HD/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/TMotorH743/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/WeActH743/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/ZeroOneX6/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/kha_eth/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/luminousbee5/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/mRoControlZeroClassic/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/mRoControlZeroH7/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/mRoControlZeroOEMH7/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/mRoNexus/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/mRoPixracerPro/hwdef.dat No Bidir support
+File /root/repos/Turtle-skybrush-ardupilot/libraries/AP_HAL_ChibiOS/hwdef/rFCU/hwdef.dat No Bidir support
+
+================================================================================
+SUMMARY
+================================================================================
+Total files processed: 358
+H7 boards with BIDIR support: 59
+Not H7 MCU: 231
+H7 but no BIDIR support: 68
+
+================================================================================
+GROUPED SUMMARY - H7 BIDIR BOARDS BY PWM COUNT
+================================================================================
+
+10 PWM outputs (4 BIDIR): 3 boards
+  - CBU-H7-Stamp
+  - MicoAir743-AIO
+  - OrqaH7QuadCore
+
+10 PWM outputs (6 BIDIR): 1 boards
+  - Here4FC
+
+11 PWM outputs (4 BIDIR): 4 boards
+  - MicoAir743
+  - SVehicle-E2
+  - YJUAV_A6SE
+  - YJUAV_A6SE_H743
+
+11 PWM outputs (5 BIDIR): 1 boards
+  - MatekH7A3
+
+12 PWM outputs (2 BIDIR): 1 boards
+  - Durandal-bdshot
+
+12 PWM outputs (4 BIDIR): 1 boards
+  - MicoAir743v2
+
+13 PWM outputs (2 BIDIR): 1 boards
+  - mRoPixracerPro-bdshot
+
+13 PWM outputs (3 BIDIR): 2 boards
+  - KakuteH7-bdshot
+  - SDMODELH7V2
+
+13 PWM outputs (4 BIDIR): 3 boards
+  - BROTHERHOBBYH743
+  - SkySakuraH743
+  - YJUAV_A6Ultra
+
+13 PWM outputs (5 BIDIR): 3 boards
+  - TBS_LUCID_H7
+  - TBS_LUCID_H7_WING
+  - TBS_LUCID_H7_WING_AIO
+
+14 PWM outputs (4 BIDIR): 6 boards
+  - KakuteH7-Wing
+  - NarinFC-H7
+  - Pixhawk6X-bdshot
+  - SkystarsH7HD-bdshot
+  - VUAV-V7pro
+  - YJUAV_A6
+
+15 PWM outputs (4 BIDIR): 2 boards
+  - CubeOrange-bdshot
+  - CubeOrangePlus-bdshot
+
+16 PWM outputs (2 BIDIR): 1 boards
+  - CUAV-X7-bdshot
+
+16 PWM outputs (4 BIDIR): 2 boards
+  - AEROFOX-H7
+  - Pixhawk6C-bdshot
+
+16 PWM outputs (5 BIDIR): 2 boards
+  - mRoCZeroOEMH7-bdshot
+  - mRoControlZeroH7-bdshot
+
+17 PWM outputs (2 BIDIR): 2 boards
+  - CUAV-7-Nano
+  - CUAV-7-Nano-ODID
+
+17 PWM outputs (6 BIDIR): 1 boards
+  - KakuteH7v2
+
+18 PWM outputs (4 BIDIR): 2 boards
+  - CUAV-Nora-bdshot
+  - SkystarsH7HDv2
+
+19 PWM outputs (4 BIDIR): 2 boards
+  - CUAV-X25-EVO
+  - CUAV-X25-EVO-ODID
+
+20 PWM outputs (3 BIDIR): 1 boards
+  - QioTekZealotH743-bdshot
+
+25 PWM outputs (4 BIDIR): 1 boards
+  - MatekH743-bdshot
+
+4 PWM outputs (2 BIDIR): 1 boards
+  - Airvolute-DCS2
+
+6 PWM outputs (6 BIDIR): 2 boards
+  - CubeRedPrimary
+  - CubeRedPrimary-PPPGW
+
+8 PWM outputs (2 BIDIR): 2 boards
+  - ARK_PI6X
+  - MWD-Capella
+
+8 PWM outputs (4 BIDIR): 5 boards
+  - AcctonGodwit_GA1
+  - AnyleafH7
+  - NxtPX4v2
+  - PixPilot-V6PRO
+  - X-MAV-AP-H743v2
+
+8 PWM outputs (5 BIDIR): 1 boards
+  - 3DRControlZeroG
+
+9 PWM outputs (3 BIDIR): 2 boards
+  - KakuteH7Mini
+  - KakuteH7Mini-Nand
+
+9 PWM outputs (4 BIDIR): 4 boards
+  - AEDROXH7
+  - ARK_FPV
+  - CubeRedSecondary
+  - MambaH743v4
+
+================================================================================
+GROUPED SUMMARY - H7 BIDIR BOARDS BY BIDIR RATIO
+================================================================================
+
+All PWM outputs are BIDIR (100%): 2 boards
+  - CubeRedPrimary
+  - CubeRedPrimary-PPPGW
+
+More than half BIDIR (>50%): 2 boards
+  - 3DRControlZeroG
+  - Here4FC
+
+Half BIDIR (50%): 6 boards
+  - AcctonGodwit_GA1
+  - Airvolute-DCS2
+  - AnyleafH7
+  - NxtPX4v2
+  - PixPilot-V6PRO
+  - X-MAV-AP-H743v2
+
+Less than half BIDIR (<50%): 49 boards
+  - AEDROXH7
+  - AEROFOX-H7
+  - ARK_FPV
+  - ARK_PI6X
+  - BROTHERHOBBYH743
+  - CBU-H7-Stamp
+  - CUAV-7-Nano
+  - CUAV-7-Nano-ODID
+  - CUAV-Nora-bdshot
+  - CUAV-X25-EVO
+  - CUAV-X25-EVO-ODID
+  - CUAV-X7-bdshot
+  - CubeOrange-bdshot
+  - CubeOrangePlus-bdshot
+  - CubeRedSecondary
+  - Durandal-bdshot
+  - KakuteH7-Wing
+  - KakuteH7-bdshot
+  - KakuteH7Mini
+  - KakuteH7Mini-Nand
+  - KakuteH7v2
+  - MWD-Capella
+  - MambaH743v4
+  - MatekH743-bdshot
+  - MatekH7A3
+  - MicoAir743
+  - MicoAir743-AIO
+  - MicoAir743v2
+  - NarinFC-H7
+  - OrqaH7QuadCore
+  - Pixhawk6C-bdshot
+  - Pixhawk6X-bdshot
+  - QioTekZealotH743-bdshot
+  - SDMODELH7V2
+  - SVehicle-E2
+  - SkySakuraH743
+  - SkystarsH7HD-bdshot
+  - SkystarsH7HDv2
+  - TBS_LUCID_H7
+  - TBS_LUCID_H7_WING
+  - TBS_LUCID_H7_WING_AIO
+  - VUAV-V7pro
+  - YJUAV_A6
+  - YJUAV_A6SE
+  - YJUAV_A6SE_H743
+  - YJUAV_A6Ultra
+  - mRoCZeroOEMH7-bdshot
+  - mRoControlZeroH7-bdshot
+  - mRoPixracerPro-bdshot
