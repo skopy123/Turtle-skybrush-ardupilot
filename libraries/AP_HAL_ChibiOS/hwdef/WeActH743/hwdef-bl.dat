@@ -46,7 +46,8 @@ define HAL_LED_ON 0
 # Add CS pins to ensure they are high in bootloader
 PB2 IMU1_CS CS
 PE11 IMU2_CS CS
-PD4 EXT_MEM CS
+#PD4 EXT_MEM CS
+PD4 FRAM_CS CS
 
 # EXT_MEM is SPI flash on shield
 # SD card in 4Bit mode do not have CS pin
@@ -81,3 +82,6 @@ PD2 SDMMC1_CMD SDMMC1
 define HAL_OS_FATFS_IO 1
 
 define AP_BOOTLOADER_FLASH_FROM_SD_ENABLED 1
+
+define HAL_USE_EMPTY_STORAGE 1
+define HAL_STORAGE_SIZE 16384
