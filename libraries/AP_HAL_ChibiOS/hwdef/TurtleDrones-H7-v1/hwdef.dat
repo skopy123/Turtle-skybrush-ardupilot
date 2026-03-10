@@ -32,21 +32,28 @@ PA14 JTCK-SWCLK SWD
 # SPI1 for IMU1 (icm42688)
 PA5 SPI1_SCK SPI1
 PA6 SPI1_MISO SPI1
-PD7 SPI1_MOSI SPI1
-PB2 IMU1_CS CS
+PA7 SPI1_MOSI SPI1
+PB2 IMU1_CS CS PULLUP
 
 # SPI3 - FRAM
 # on those pins can be exchanged for SPI6
 PB3 SPI3_SCK SPI3
 PB4 SPI3_MISO SPI3
 PB5 SPI3_MOSI SPI3
-PD4 FRAM_CS CS
+# PD4 FRAM_CS CS
+# bug na v1 PCB, pouzit PD3 pro CS
+PD3 FRAM_CS CS PULLUP
 
 # SPI4 for IMU2 (icm42688)
-PE11 IMU2_CS CS
 PE12 SPI4_SCK SPI4
 PE13 SPI4_MISO SPI4
 PE14 SPI4_MOSI SPI4
+PE11 IMU2_CS CS PULLUP
+
+
+# logging broke down mavlink connection over OTG1, not sure which one
+#define HAL_LOGGING_ENABLED 1
+#define HAL_INS_PROBE_LOG_ENABLED 1
 
 # two I2C bus
 I2C_ORDER I2C1 I2C2
@@ -73,26 +80,15 @@ define HAL_I2C_MAX_CLOCK 100000 # hodnoty mensi nez 100k ignorovano, zmeni se na
 # na jinych FC funguje baro a compass na I2C0, a tady to dela problemy
 
 # ADC
-PC0 BATT_VOLTAGE_SENS ADC1 SCALE(1)
-PC1 BATT_CURRENT_SENS ADC1 SCALE(1)
-# PA4 BATT2_VOLTAGE_SENS ADC1 SCALE(1)
-# PA7 BATT2_CURRENT_SENS ADC1 SCALE(1)
+PC5 BATT_VOLTAGE_SENS ADC1 SCALE(1)
+PC4 BATT_CURRENT_SENS ADC1 SCALE(1)
+define HAL_BATT_VOLT_PIN 8
+define HAL_BATT_CURR_PIN 4
+define HAL_BATT_VOLT_SCALE 22.0
+define HAL_BATT_CURR_SCALE 40.0
 
 # TODO change batt source to SMBus later
 define HAL_BATT_MONITOR_DEFAULT 3
-define HAL_BATT_VOLT_PIN 10
-define HAL_BATT_CURR_PIN 11
-#define HAL_BATT2_VOLT_PIN 18
-#define HAL_BATT2_CURR_PIN 7
-define HAL_BATT_VOLT_SCALE 22.0
-define HAL_BATT_CURR_SCALE 40.0
-#define HAL_BATT2_VOLT_SCALE 11.0
-
-# PC4 PRESSURE_SENS ADC1 SCALE(2)
-# define HAL_DEFAULT_AIRSPEED_PIN 4
-
-# PC5 RSSI_ADC ADC1
-# define BOARD_RSSI_ANA_PIN 8
 
 # LED
 # white LED1 marked as B/E
@@ -133,12 +129,14 @@ PD8 USART3_TX USART3
 # UART4 (spare) - ok
 PB9 UART4_TX UART4
 PB8 UART4_RX UART4
+NODMA UART4*
 
 # USART6 (spare) - check if RC in needed?
 #PC7 TIM3_CH2 TIM3 RCININT PULLDOWN LOW
 #PC6 USART6_TX USART6 NODMA
 PC7 USART6_RX USART6
 PC6 USART6_TX USART6
+NODMA USART6*
 
 # UART7 (telem1) - ok
 PE7 UART7_RX UART7
@@ -149,6 +147,7 @@ PE9  UART7_RTS UART7 LOW PULLDOWN
 # UART8 (spare) -ok
 PE0 UART8_RX UART8 
 PE1 UART8_TX UART8 
+NODMA UART8*
 
 # CAN bus
 # PD0 CAN1_RX CAN1
@@ -159,11 +158,6 @@ PE1 UART8_TX UART8
 define HAL_USE_CAN 0
 
 # Motors
-# Group 2
-#PA0  TIM5_CH1  TIM5  PWM(1)  GPIO(52) #Motor 3
-#PA1  TIM5_CH2  TIM5  PWM(2)  GPIO(53) #Motor 4
-#PA2  TIM5_CH3  TIM5  PWM(3)  GPIO(54) #Motor 5
-#PA3  TIM5_CH4  TIM5  PWM(4)  GPIO(55) #Motor 6
 
 #BDSHOT group 2
 PA0  TIM5_CH1 TIM5 PWM(1) GPIO(52) BIDIR
@@ -171,18 +165,15 @@ PA1  TIM5_CH2 TIM5 PWM(2) GPIO(53)
 PA2  TIM5_CH3 TIM5 PWM(3) GPIO(54) BIDIR
 PA3  TIM5_CH4 TIM5 PWM(4) GPIO(55)
 
-# group 1
-PB0  TIM8_CH2N TIM8  PWM(5)  GPIO(50)
-PB1  TIM8_CH3N TIM8  PWM(6)  GPIO(51)
+# Group G5 - LED board
+PD12 TIM4_CH1 TIM4 PWM(5) GPIO(56)
+PD13 TIM4_CH2 TIM4 PWM(6) GPIO(57)
+PD14 TIM4_CH3 TIM4 PWM(7) GPIO(58)
+PD15 TIM4_CH4 TIM4 PWM(8) GPIO(59)
 
-# Group 3
-PD12 TIM4_CH1 TIM4 PWM(7) GPIO(56)
-PD13 TIM4_CH2 TIM4 PWM(8) GPIO(57)
-PD14 TIM4_CH3 TIM4 PWM(9) GPIO(58)
-PD15 TIM4_CH4 TIM4 PWM(10) GPIO(59)
-# Group 4
-PE5  TIM15_CH1 TIM15 PWM(11) GPIO(60)
-PE6  TIM15_CH2 TIM15 PWM(12) GPIO(61)
+# group 4 - spare
+PB0  TIM8_CH2N TIM8  PWM(9)  GPIO(50)
+PB1  TIM8_CH3N TIM8  PWM(10)  GPIO(51)
 
 # not connected
 # PA8 TIM1_CH1 TIM1 PWM(13) GPIO(62) # for WS2812 LED on original matek h743 
@@ -199,60 +190,58 @@ PC12 SDMMC1_CK SDMMC1
 PD2 SDMMC1_CMD SDMMC1
 
 # GPIOs - # not connected, but awailable for futrue use
-PD10  PINIO1 OUTPUT GPIO(81) LOW
-PD11  PINIO2 OUTPUT GPIO(82) LOW
+#PD10  PINIO1 OUTPUT GPIO(81) LOW
+#PD11  PINIO2 OUTPUT GPIO(82) LOW
 
 DMA_PRIORITY S*
 
-# define HAL_STORAGE_SIZE 32768
-# enable RAMTROM parameter storage
-define HAL_STORAGE_SIZE 32768
-#define HAL_WITH_RAMTRON 1
-define HAL_WITH_RAMTRON 0
 
+# enable RAMTROM parameter storage
+define HAL_STORAGE_SIZE 16384
+define HAL_WITH_RAMTRON 1
 
 # use last 2 pages for flash storage
 # H743 has 16 pages of 128k each
 STORAGE_FLASH_PAGE 14
 
 # spi devices
-SPIDEV icm42688_1  SPI1 DEVID1 IMU1_CS      MODE3  2*MHZ 10*MHZ   
-SPIDEV icm42688_2  SPI4 DEVID1 IMU2_CS      MODE3  2*MHZ 10*MHZ
-#SPIDEV ramtron     SPI3 DEVID1 FRAM_CS      MODE0  1*MHZ 1*MHZ
+SPIDEV icm42688_1  SPI1 DEVID1 IMU1_CS      MODE3  1*MHZ 12*MHZ   
+SPIDEV icm42688_2  SPI4 DEVID3 IMU2_CS      MODE3  1*MHZ 12*MHZ
+SPIDEV ramtron     SPI3 DEVID2 FRAM_CS      MODE0  12*MHZ 12*MHZ
+#ramtron should be capable if 25Mhz, IMUs up to 24mhz
 
 DMA_NOSHARE SPI1* SPI3* SPI4*
+#DMA_NOSHARE SPI1* SPI4*
 
 #############
 # IMU part
 #############
-# turtle drone FC
-#IMU Invensensev3 SPI:icm42688_1 ROTATION_NONE
-#IMU Invensensev3 SPI:icm42688_2 ROTATION_YAW_270 
-
-#fix for TDK axis orientation
+#default orientation is chip on bottom side of board. there will be board flip defined in default param.
 IMU Invensensev3 SPI:icm42688_1 ROTATION_YAW_270
 IMU Invensensev3 SPI:icm42688_2 ROTATION_NONE
-#pitch 180 is equal to #ROTATION_ROLL_180_YAW_180 
 
 # povoleni HAL_DEFAULT_INS_FAST_SAMPLE zpusobi ze prvni IMU jede na 2khz a druhy na 1khz, to zpusobuje spoustu problemu s casovanim, vypnuti fast sample by melo vyresit problemy s IMO inconsent.
-define HAL_DEFAULT_INS_FAST_SAMPLE 3
-# s 0 se stale obevuje accel inconsisten. s 3 taky
 #define HAL_DEFAULT_INS_FAST_SAMPLE 3
+# s 0 se stale obevuje accel inconsisten. s 3 taky
+#define HAL_DEFAULT_INS_FAST_SAMPLE 1
 
 
 ####################
 #BARO part
 ####################
-#our baro, correct definition
+#our onboard baro, 0x76 is default adress, can be changed to 0x77 by solder bridge on PCB.
 BARO BMP388 I2C:0:0x76
-# commented out just for mag test
-#define HAL_BARO_ALLOW_INIT_NO_BARO 1
 
 ##################
 #COMPASS part
 ##################
 
-COMPASS IST8310 I2C:0:0x0C true ROTATION_ROLL_180
+# true nebo false pro internal/external compass, pro externi musi byt true.
+COMPASS IST8310 I2C:0:0x0C true ROTATION_ROLL_180 # turtle drone mini baro board.
+COMPASS RM3100 I2C:0:0x20 false ROTATION_NONE
+COMPASS RM3100 I2C:0:0x21 false ROTATION_NONE
+COMPASS RM3100 I2C:0:0x22 false ROTATION_NONE
+COMPASS RM3100 I2C:0:0x23 false ROTATION_NONE
 # force external je potreba nastavit na true, jinak to nefunguje na externi sbernici
 # no built-in compass, but probe the i2c bus for all possible
 # external compass types

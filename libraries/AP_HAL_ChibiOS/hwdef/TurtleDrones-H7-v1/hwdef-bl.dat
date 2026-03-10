@@ -30,6 +30,7 @@ PE8 UART7_TX UART7 NODMA
 # PA10 IO-debug-console
 PA11 OTG_FS_DM OTG1
 PA12 OTG_FS_DP OTG1
+USB_STRING_MANUFACTURER "TurtleDrones-BL"
 
 PA13 JTMS-SWDIO SWD
 PA14 JTCK-SWCLK SWD
@@ -37,16 +38,19 @@ PA14 JTCK-SWCLK SWD
 # make sure Vsw is on during bootloader - no SW on board
 # PD10  PINIO1 OUTPUT LOW
 
-# LED on PE3 -red and PE4 - white
-
+# LED on PE3 -red and 
 PE3 LED_BOOTLOADER OUTPUT LOW
+#PE4 - white
 PE4 LED_ACTIVITY OUTPUT LOW
 define HAL_LED_ON 0
 
 # Add CS pins to ensure they are high in bootloader
-PB2 IMU1_CS CS
-PE11 IMU2_CS CS
-PD4 FRAM_CS CS
+PB2 IMU1_CS CS PULLUP
+PE11 IMU2_CS CS PULLUP
+#PD4 FRAM_CS CS PULLUP
+# bug na v1 PCB, pouzit PD3 pro CS
+PD3 FRAM_CS CS PULLUP 
+
 
 # support flashing from SD card:
 
@@ -73,5 +77,6 @@ define HAL_OS_FATFS_IO 1
 define AP_BOOTLOADER_FLASH_FROM_SD_ENABLED 1
 
 #ramtron tmp disable
-#define HAL_USE_EMPTY_STORAGE 1
-#define HAL_STORAGE_SIZE 16384
+define HAL_USE_EMPTY_STORAGE 1
+# before there was 16K, 32k cause crash in bootloader
+define HAL_STORAGE_SIZE 16384

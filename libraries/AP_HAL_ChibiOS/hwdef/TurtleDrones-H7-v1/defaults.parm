@@ -47,6 +47,8 @@ SERVO9_FUNCTION	    109
 SERVO9_MIN	        1100
 SERVO9_MAX	        2000
 
+#serials
+
 #serial 0 - OTG1 - USB - protocol MAVLink2
 SERIAL0_BAUD        115
 SERIAL0_PROTOCOL    2
@@ -96,6 +98,8 @@ RC10_OPTION     31
 #arm switch
 RC5_OPTION      153
 
+#dual IMU
+EK3_IMU_MASK 3
 
 
 

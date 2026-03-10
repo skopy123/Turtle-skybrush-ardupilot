@@ -14,6 +14,7 @@
 /Tools/autotest/jsbsim_fgout_0.xml
 /Tools/autotest/jsbsim_start_0.xml
 /Tools/autotest/rover-ch7_mission.txt
+/Tools/bootloaders/*
 /tmp/*
 # Exclude all bins but allow font bins and bootloaders
 *.bin
@@ -178,3 +179,4 @@ autotest_result_*_junit.xml
 
 # Ignore compiled firmware folder
 dist/
+*.Zone.Identifier
