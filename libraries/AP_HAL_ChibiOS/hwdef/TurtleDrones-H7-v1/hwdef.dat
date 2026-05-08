@@ -221,7 +221,7 @@ IMU Invensensev3 SPI:icm42688_1 ROTATION_YAW_270
 IMU Invensensev3 SPI:icm42688_2 ROTATION_NONE
 
 # povoleni HAL_DEFAULT_INS_FAST_SAMPLE zpusobi ze prvni IMU jede na 2khz a druhy na 1khz, to zpusobuje spoustu problemu s casovanim, vypnuti fast sample by melo vyresit problemy s IMO inconsent.
-#define HAL_DEFAULT_INS_FAST_SAMPLE 3
+define HAL_DEFAULT_INS_FAST_SAMPLE 3
 # s 0 se stale obevuje accel inconsisten. s 3 taky
 #define HAL_DEFAULT_INS_FAST_SAMPLE 1
 
@@ -238,10 +238,16 @@ BARO BMP388 I2C:0:0x76
 
 # true nebo false pro internal/external compass, pro externi musi byt true.
 COMPASS IST8310 I2C:0:0x0C true ROTATION_ROLL_180 # turtle drone mini baro board.
-COMPASS RM3100 I2C:0:0x20 false ROTATION_NONE
-COMPASS RM3100 I2C:0:0x21 false ROTATION_NONE
-COMPASS RM3100 I2C:0:0x22 false ROTATION_NONE
-COMPASS RM3100 I2C:0:0x23 false ROTATION_NONE
+
+#tests
+COMPASS IST8310 I2C:0:0x0D true ROTATION_NONE
+COMPASS IST8310 I2C:0:0x0E true ROTATION_NONE
+COMPASS IST8310 I2C:0:0x0F true ROTATION_NONE
+
+COMPASS RM3100 I2C:0:0x20 true ROTATION_YAW_90 #holybro GPS
+#COMPASS RM3100 I2C:0:0x21 true ROTATION_NONE
+#COMPASS RM3100 I2C:0:0x22 true ROTATION_NONE
+#COMPASS RM3100 I2C:0:0x23 true ROTATION_NONE
 # force external je potreba nastavit na true, jinak to nefunguje na externi sbernici
 # no built-in compass, but probe the i2c bus for all possible
 # external compass types
