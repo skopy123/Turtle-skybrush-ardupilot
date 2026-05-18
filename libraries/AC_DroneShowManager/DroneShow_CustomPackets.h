@@ -17,9 +17,10 @@
 
 namespace CustomPackets {
     static const uint8_t START_CONFIG = 1;
-    static const uint8_t CRTL_TRIGGER = 2;
+    static const uint8_t DEPRECATED_CRTL_TRIGGER = 2;
     static const uint8_t SIMPLE_GEOFENCE_SETUP = 3;
     static const uint8_t ACKNOWLEDGMENT = 4;
+    static const uint8_t TIME_AXIS_CONFIG = 5;
 
     static const uint8_t DRONE_TO_GCS_STATUS = 0x5b;
     static const uint8_t GCS_TO_DRONE = 0x5c;
@@ -67,14 +68,6 @@ namespace CustomPackets {
     } start_config_t;
 
     typedef struct PACKED {
-        // Timestamp to trigger collective RTL at, relative to the show start,
-        // in seconds. Zero is a special value, it clears any scheduled
-        // collective RTL for the future if the drone has not started the
-        // CRTL trajectory yet.
-        uint16_t start_time;
-    } crtl_trigger_t;
-
-    typedef struct PACKED {
         // Number of points in the polygon geofence; zero means that the polygon
         // fence is off.
         uint8_t num_points;
@@ -116,6 +109,46 @@ namespace CustomPackets {
         // Result of the acknowledgment.
         MAV_RESULT result;
     } acknowledgment_t;
+    
+    typedef struct PACKED {
+        // Sequence number; used to filter duplicates.
+        uint8_t seq_no;
+        
+        // Number of scenes in the time axia configuration.
+        uint8_t num_scenes;
+        
+        // Two reserved bytes for future extension
+        uint16_t reserved;
+        
+        // Start time of the show, milliseconds since the UNIX epoch. Currently rounded
+        // to the nearest second, but this may change in the future. Zero means that the
+        // start time is not set yet.
+        uint64_t start_time_msec;
+    } time_axis_config_header_t;
+    
+    typedef struct PACKED {
+        // Number of finite time axis segments in the scene.
+        uint8_t num_entries;
+        
+        // Number of milliseconds since the start of the show (from the header) when 
+        // the show clock of this scene is at 00:00.
+        uint32_t origin_msec;
+        
+        // Scene identifier; specifies whether the scene is the main show or a
+        // coordinated return-to-home scene.
+        uint16_t scene_id;
+    } time_axis_config_scene_header_t;
+    
+    typedef struct PACKED {
+        // Initial rate of the time axis segment, scaled to the [0; 65535] range.
+        uint16_t initial_rate_scaled;
+
+        // Final rate of the time axis segment, scaled to the [0; 65535] range.
+        uint16_t final_rate_scaled;
+        
+        // Duration of the time axis segment, in milliseconds.
+        uint32_t duration_msec;
+    } time_axis_config_scene_entry_t;
 };
 
 static_assert(

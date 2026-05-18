@@ -16,23 +16,11 @@
 
 #include <GCS_MAVLink/ap_message.h>
 
-#include <skybrush/colors.h>
-#include <skybrush/stats.h>
+#include <skybrush/skybrush.h>
 
 #include "DroneShow_Enums.h"
 #include "DroneShow_FenceConfig.h"
-
-struct sb_trajectory_s;
-struct sb_trajectory_player_s;
-
-struct sb_light_program_s;
-struct sb_light_player_s;
-
-struct sb_yaw_control_s;
-struct sb_yaw_player_s;
-
-struct sb_event_list_s;
-struct sb_event_list_player_s;
+#include "skybrush/screenplay.h"
 
 class DroneShowLEDFactory;
 class DroneShowLED;
@@ -73,11 +61,11 @@ private:
 
         // Converts a coordinate given in the global GPS coordinate system to
         // the show coordinate system, in millimeters
-        void convert_global_to_show_coordinate(const Location& loc, sb_vector3_with_yaw_t& vec) const;
+        void convert_global_to_show_coordinate(const Location& loc, sb_vector3_t& vec) const;
 
         // Converts a coordinate given in the show coordinate system, in millimeters, to
         // the global GPS coordinate system
-        void convert_show_to_global_coordinate(sb_vector3_with_yaw_t vec, Location& loc) const;
+        void convert_show_to_global_coordinate(sb_vector3_t vec, Location& loc) const;
 
         // Converts a yaw angle given in the show coordinate system, in degrees, to
         // centidegrees relative to north
@@ -133,17 +121,19 @@ public:
         Vector3f pos;
         Vector3f vel;
         Vector3f acc;
-        bool unlock_altitude;
         float yaw_cd;
         float yaw_rate_cds;
+        bool unlock_altitude;
+        bool reached_end;
 
         void clear() {
             pos.zero();
             vel.zero();
             acc.zero();
-            unlock_altitude = false;
             yaw_cd = 0.0f;
             yaw_rate_cds = 0.0f;
+            unlock_altitude = false;
+            reached_end = false;
         }
     };
 
@@ -161,18 +151,6 @@ public:
 
     // Initializes the drone show subsystem at boot time
     void init(const AC_WPNav* wp_nav);
-
-    // Returns whether the user has asked the drone show manager to cancel the
-    // show as soon as possible. This flag is checked regularly from
-    // mode_drone_show.cpp
-    bool cancel_requested() const { return _cancel_requested; }
-
-    // Clears the scheduled time for a collective RTL maneuver. Returns whether
-    // the request was processed.
-    //
-    // This function is a no-op if the drone show is not in the "performing"
-    // phase and 'force' is set to false.
-    bool clear_scheduled_collective_rtl(bool force = false);
 
     // Clears the scheduled start time of the show (but does not cancel the
     // show if it is already running). Returns whether the request was
@@ -210,8 +188,9 @@ public:
     // during the execution of the show.
     uint32_t get_controller_update_delta_msec() const { return _controller_update_delta_msec; }
 
-    // Returns the guided mode command that should be sent during the performance
-    // when the function is invoked
+    // Retrieves the guided mode command that should be sent during the performance
+    // when the function is invoked. Returns true if the command was updated successfully,
+    // false when failed to update the command.
     bool get_current_guided_mode_command_to_send(
         GuidedModeCommand& command,
         int32_t default_yaw_cd,
@@ -228,26 +207,17 @@ public:
     // Returns the desired position of the drone during the drone show the
     // given number of seconds after the start time, in the global coordinate
     // system, using centimeters as units.
-    void get_desired_global_position_at_seconds(float time, Location& loc);
+    bool get_desired_global_position_at_seconds(float time, Location& loc) WARN_IF_UNUSED;
 
     // Returns the desired velocity of the drone during the drone show the
     // given number of seconds after the start time, in the global NEU
     // cooordinate system, using centimeters per seconds as units.
-    void get_desired_velocity_neu_in_cms_per_seconds_at_seconds(float time, Vector3f& vel);
+    bool get_desired_velocity_neu_in_cms_per_seconds_at_seconds(float time, Vector3f& vel) WARN_IF_UNUSED;
 
-    // Returns the desired acceleration of the drone during the drone show the
-    // given number of seconds after the start time, in the global NEU
-    // cooordinate system, using centimeters per seconds squared as units.
-    void get_desired_acceleration_neu_in_cms_per_seconds_squared_at_seconds(float time, Vector3f& acc);
-
-    // Returns the desired yaw of the drone during the drone show the
-    // given number of seconds after the start time, in centidegrees 
-    // relative to North.
-    float get_desired_yaw_cd_at_seconds(float time);
-
-    // Returns the desired yaw rate of the drone during the drone show the
-    // given number of seconds after the start time, in centidegrees/seconds.
-    float get_desired_yaw_rate_cds_at_seconds(float time);
+    // Returns the desired yaw and yaw rate of the drone during the drone show the
+    // given number of seconds after the start time. Yaw is returned in centidegrees
+    // relative to North; yaw rate is returned in centidegrees/seconds.
+    bool get_desired_yaw_cd_and_yaw_rate_cd_s_at_seconds(float time, float& yaw_cd, float& yaw_rate_cd_s) WARN_IF_UNUSED;
 
     // Returns the distance of the drone from its desired position during the
     // "Performing" stage of the show. Returns zero distance when not doing a show.
@@ -278,12 +248,6 @@ public:
     // zero, which marks the end of the list.
     const TelemetryRequest* get_preferred_telemetry_messages() const;
 
-    // Returns the landing time relative to the start of the show
-    float get_relative_landing_time_sec() const { return _trajectory_stats->landing_time_sec; }
-
-    // Returns the takeoff time relative to the start of the show
-    float get_relative_takeoff_time_sec() const { return _trajectory_stats->takeoff_time_sec; }
-
     // Returns the start time in microseconds. Depending on the value of the
     // SHOW_SYNC_MODE parameter, this might be an internal timestamp or a
     // UNIX timestamp. Do _not_ use this method for anything else than
@@ -296,16 +260,13 @@ public:
         );
     }
 
-    // Returns the total duration of the loaded trajectory, in seconds
-    float get_total_duration_sec() const { return _trajectory_stats->duration_sec; }
-
-    // Returns the number of seconds elapsed since show start, in microseconds
+    // Returns the number of seconds elapsed since show start, in microseconds (wall clock time)
     int64_t get_elapsed_time_since_start_usec() const;
 
-    // Returns the number of seconds elapsed since show start, in milliseconds
+    // Returns the number of seconds elapsed since show start, in milliseconds (wall clock time)
     int32_t get_elapsed_time_since_start_msec() const;
 
-    // Returns the number of seconds elapsed since show start, in seconds
+    // Returns the number of seconds elapsed since show start, in seconds (wall clock time)
     float get_elapsed_time_since_start_sec() const;
 
     // Returns the current stage that the drone show mode is in
@@ -317,6 +278,14 @@ public:
     // Returns the takeoff acceleration in meters per second squared
     float get_motor_spool_up_time_sec() const;
     
+    // Returns the color to use in return-to-home transitions (both individual and collective)
+    sb_rgb_color_t get_rth_transition_color() const;
+
+    // Returns the current scene index and the time elapsed within the scene, according
+    // to the show controller. Both the scene index and the show clock time within the scene
+    // will be zero if the show is not in the "performing" stage.
+    void get_scene_index_and_show_clock_within_scene(ssize_t* scene, float* show_clock_sec) const;
+
     // Returns the takeoff acceleration in meters per second squared
     float get_takeoff_acceleration_m_ss() const {
         float result = _wp_nav ? _wp_nav->get_accel_z() / 100.0f : 0;
@@ -339,11 +308,9 @@ public:
     // Returns the number of seconds left until show start, in seconds
     float get_time_until_start_sec() const;
 
-    // Returns the number of seconds left until the time when we should take off
-    float get_time_until_takeoff_sec() const;
-
-    // Returns the number of seconds left until the time when we should land
-    float get_time_until_landing_sec() const;
+    // Returns the number of seconds left until the time when we should take off,
+    // assuming that there will be no changes to the time axis configuration of the show
+    float get_time_until_takeoff_sec();
 
     // Returns the velocity feed-forward gain factor to use during velocity control
     float get_velocity_feedforward_gain() const { return _params.velocity_feedforward_gain; }
@@ -393,12 +360,57 @@ public:
             : _start_time_on_internal_clock_usec > 0
         );
     }
+    
+    // Returns whether a collective RTH operation was triggered
+    bool is_collective_rth_triggered() const {
+        // Currently we take a shortcut here and simply return true if we have more than
+        // one scene in the screenplay. This is correct for the current implementation
+        // of the show controller, but if we add more complexity to the show
+        // controller in the future, we might want to track this with a separate flag.
+        return sb_screenplay_size(&_screenplay) > 1;
+    }
 
-    // Returns whether a valid takeoff time was determined for the show
-    bool has_valid_takeoff_time() const {
+    // Returns whether any motor output from show mode is disabled due to testing
+    // purposes.
+    bool is_motor_output_disabled() const {
+        return _has_option(DroneShowOption_PreventMotorOutput);
+    }
+    
+    // Returns whether the performance of the show has finished, based on the current
+    // state and output of the show controller. The return value of this function can
+    // be used to trigger the post-show action.
+    // 
+    // The performance is considered completed if we are in the "performing" stage and
+    // the show controller has reported that the current time is beyond the time axis
+    // limits, _or_ if we are in the "landing", "landed", "loiter", "RTL" or "error" stages.
+    // In all these states, the _normal_ performance of the show has ended, even though
+    // the drone may still be flying.
+    bool is_performance_completed() const {
+        switch (_stage_in_drone_show_mode) {
+            case DroneShow_Performing:
+                return sb_show_controller_is_output_valid(&_show_controller) &&
+                       sb_show_controller_has_reached_end(&_show_controller);
+
+            case DroneShow_Landing:
+            case DroneShow_Landed:
+            case DroneShow_Loiter:
+            case DroneShow_RTL:
+            case DroneShow_Error:
+                return true;
+                
+            default:
+                return false;
+        }
+    }
+
+    // Returns whether the trajectory of the show seems plausible:
+    // - has a takeoff time (i.e. a moment when the drone ascends above the takeoff altitude)
+    // - has a landing time (i.e. a moment when the drone sinks below the takeoff altitude)
+    // - landing time comes later than the takeoff time
+    bool is_trajectory_plausible() const {
         return (
-            _trajectory_stats->takeoff_time_sec >= 0 && 
-            _trajectory_stats->landing_time_sec > _trajectory_stats->takeoff_time_sec
+            _trajectory_stats.takeoff_time_sec >= 0 && 
+            _trajectory_stats.landing_time_sec > _trajectory_stats.takeoff_time_sec
         );
     }
 
@@ -412,12 +424,6 @@ public:
     // otherwise it returns false unconditionally.
     bool is_prepared_to_take_off() const;
 
-    // Returns whether we are feeding desired acceleration information into the
-    // lower-level position controller of ArduPilot
-    bool is_acceleration_control_enabled() const {
-        return _params.control_mode_flags & DroneShowControl_AccelerationControlEnabled;
-    }
-
     // Returns whether we are feeding desired velocity information into the
     // lower-level position controller of ArduPilot
     bool is_velocity_control_enabled() const {
@@ -427,16 +433,16 @@ public:
     // Returns whether a show file was identified and loaded at boot time
     bool loaded_show_data_successfully() const;
 
-    // Returns whether yaw control was loaded from the show file at boot time
-    bool loaded_yaw_control_data_successfully() const;
-
     // Returns whether the drone matches the given group mask
     bool matches_group_mask(uint8_t mask) const {
         return mask == 0 || mask & (1 << _params.group_index);
     }
     
     // Notifies the drone show manager that the drone show mode was initialized
-    void notify_drone_show_mode_initialized();
+    // 
+    // Returns true if the initialization was successful and false if there was
+    // an error that prevents the drone show mode from entering drone show mode.
+    bool notify_drone_show_mode_initialized();
 
     // Notifies the drone show manager that the drone show mode exited
     void notify_drone_show_mode_exited();
@@ -495,10 +501,6 @@ public:
     // Returns whether the drone should switch to show mode when authorized to start
     bool should_switch_to_show_mode_when_authorized() const;
 
-    // Asks the drone show manager to cancel the show as soon as possible if
-    // the show is running yet
-    void stop_if_running();
-
     // Updates the state of the LED light on the drone and performs any additional
     // tasks that have to be performed regularly (such as checking for changes
     // in parameter values). This has to be called at 50 Hz, but most of its
@@ -508,9 +510,16 @@ public:
 
     // Returns whether the manager uses GPS time to start the show
     bool uses_gps_time_for_show_start() const { return _params.time_sync_mode == TimeSyncMode_GPS; }
-
+    
+    // Writes a message containing the trigger of a collective RTL maneuver into the log
+    void write_crth_trigger_log_message(float rth_start_time_sec, sb_vector3_t start) const;
+    
     // Writes a message containing a summary of the gefence status into the log
     void write_fence_status_log_message() const;
+
+    // Writes a sequence of log messages containing a representation of the current time
+    // axis
+    void write_screenplay_log_messages();
 
     // Writes a message holding the status of the drone show subsystem into the log
     void write_show_status_log_message() const;
@@ -659,25 +668,49 @@ private:
     bool _sock_rgb_open;
 #endif
 
+    // Whether the drone show manager was initialized successfully
+    bool _init_ok;
+
     // Memory area holding the entire show file loaded from the storage
     uint8_t* _show_data;
+    
+    // Screenplay of the show.
+    // 
+    // In normal conditions, the screenplay has a single chapter, which holds
+    // references to the trajectory, light program, yaw program and event list.
+    // However, the screenplay may be extended with an additional return-to-launch
+    // chapter if a collective RTL operation is scheduled during the show.
+    sb_screenplay_t _screenplay;
+    
+    // Reference scene containing the trajectory, light program and yaw program of
+    // the show. This is needed to ensure that we always have references to the
+    // original data, even if the screenplay is modified in a way that it does not
+    // refer to the loaded show any more.
+    // 
+    // Also ensure that we can get a handle to the trajectory of the show any time
+    // to modify its ending at takeoff even if the screenplay does not contain it.
+    sb_screenplay_scene_t _main_show_scene;
 
-    struct sb_trajectory_s* _trajectory;
-    struct sb_trajectory_player_s* _trajectory_player;
-    sb_trajectory_stats_t* _trajectory_stats;
-    bool _trajectory_valid;
-
-    struct sb_light_program_s* _light_program;
-    struct sb_light_player_s* _light_player;
-    bool _light_program_valid;
-
-    struct sb_yaw_control_s* _yaw_control;
-    struct sb_yaw_player_s* _yaw_player;
-    bool _yaw_control_valid;
-
-    struct sb_event_list_s* _event_list;
-    struct sb_event_list_player_s* _event_list_player;
-    bool _event_list_valid;
+    // Controller that manages the trajectory player, the light program player,
+    // the yaw player, the event list and the time axis.
+    sb_show_controller_t _show_controller;
+    
+    // Structure holding information about the current trajectory, including the
+    // takeoff time, the landing time, the total duration and the takeoff location.
+    // Takeoff and landing times are according to the _show clock_.
+    sb_trajectory_stats_t _trajectory_stats;
+    
+    // Projected duration of the time interval from the start of the show to the
+    // takeoff, in wall clock time, according to the current screenplay of the show,
+    // under the assumption that the screenplay will not change. This is used to
+    // trigger the motor start command and the takeoff command at the right time.
+    // 
+    // The variable must be updated whenever the screenplay is changed or a new
+    // trajectory is loaded.
+    // 
+    // NaN means that the takeoff time was not calculated yet and needs to be
+    // recalculated.
+    float _projected_wall_clock_time_at_takeoff_sec;
 
     // Result of the drone show specific preflight checks. Updated periodically
     // from _update_preflight_check_result(). See the values from the
@@ -711,10 +744,6 @@ private:
     // Takeoff position, in local coordinates, relative to the show coordinate system.
     // Zero if no show data is loaded. Units are in millimeters.
     Vector3f _takeoff_position_mm;
-    
-    // Time when we need to start a coordinated RTL trajectory, relative to the
-    // start of the show, in seconds. Zero if unscheduled.
-    float _crtl_start_time_sec;
 
     // Structure storing the details of a light signal requested by the user,
     // including its start time, duration, color, priority etc.
@@ -745,11 +774,6 @@ private:
     // multiple times when the show is restarted.
     bool _trajectory_modified_for_landing;
 
-    // Flag that is set to true if the user has instructed the drone show manager
-    // to cancel the show as soon as possible. This is checked regularly by
-    // mode_drone_show.cpp
-    bool _cancel_requested;
-
     // The preferred duration between consecutive guided mode commands
     // during the execution of the show. Updated soon after the corresponding
     // parameter changes.
@@ -775,6 +799,9 @@ private:
 
     // Last guided mode command that was sent
     GuidedModeCommand _last_setpoint;
+    
+    // Sequence number of the last time axis configuration packet that was processed
+    uint16_t _last_time_axis_config_seq_no;
 
     // Timestamp that defines whether the RC start switch is blocked (and if so, until when)
     uint32_t _rc_switches_blocked_until;
@@ -803,9 +830,6 @@ private:
     // has passed
     void _check_radio_failsafe();
 
-    // Clears the start time of the drone show after a successful landing
-    void _clear_start_time_after_landing();
-
     // Clears the start time of the drone show if it was set by the user with the RC switch
     void _clear_start_time_if_set_by_switch();
 
@@ -819,7 +843,25 @@ private:
     // Creates the directory in which the drone show specific files are stored
     // on the filesystem
     bool _create_show_directory();
-
+    
+    // Ensures that the time axis of the given scene is set up in a way that the
+    // relevant part of the trajectory will be played in full.
+    // 
+    // The relevant part is defined as follows. If the trajectory is the main show
+    // trajectory, its relevant part is all the way up to the point where it crosses
+    // the takeoff altitude for the last time from above. Otherwise, it is the full
+    // duration of the trajectory. This is to ensure that we trigger the landing at
+    // the end of the normal show trajectory at the takeoff altitude so ArduPilot can
+    // take over with its own landing algorithm (which has landing detection enabled).
+    //
+    // If the current time axis configuration has a total duration that is shorter than
+    // the duration of the relevant part of the trajectory, the time axis will be
+    // extended with a new segment with the given initial and final rates and the
+    // necessary duration.
+    bool _ensure_scene_covers_relevant_part_of_trajectory(
+        sb_screenplay_scene_t* scene, float initial_rate, float final_rate
+    ) WARN_IF_UNUSED;
+    
     // Fills the given buffer with basic drone show telemetry data and returns
     // a pointer to after the last byte written into the buffer.
     //
@@ -855,7 +897,16 @@ private:
     // light signals. The timestamp is synced to GPS seconds when the drone has
     // a good GPS fix.
     uint32_t _get_gps_synced_timestamp_in_millis_for_lights() const;
-
+    
+    // Returns the raw control output from the show controller at the given number of
+    // seconds after show start. Units and vectors returned in the control output are
+    // not transformed to the show coordinate system.
+    // 
+    // May return null if the show controller fails to switch to the given timestamp.
+    // This is unlikely and probably indicates bigger problems, but we need to handle
+    // it anyway.
+    const sb_control_output_t* _get_raw_show_control_output_at_seconds(float time);
+    
     // Handles a generic MAVLink DATA* message from the ground station.
     bool _handle_custom_data_message(mavlink_channel_t chan, uint8_t type, void* data, uint8_t length);
 
@@ -873,13 +924,19 @@ private:
 
     // Handles a MAVLink LED_CONTROL message from the ground station.
     bool _handle_led_control_message(const mavlink_message_t& msg);
-
-    // Callback that is called when entering the "landed" stage
-    void _handle_switch_to_landed_state();
+    
+    // Handles a time axis configuration packet whose length has already been verified
+    bool _handle_time_axis_configuration_packet(void* data, uint8_t length);
 
     // Returns whether the given option flag is set in the SHOW_OPTIONS parameter
     bool _has_option(DroneShowOptionFlag option) const {
         return (_params.show_options & option) != 0;
+    }
+    
+    // Invalidates the projected time until takeoff, so it will be recalculated later
+    // if needed.
+    void _invalidate_projected_wall_clock_time_at_takeoff() {
+        _projected_wall_clock_time_at_takeoff_sec = NAN;
     }
 
     // Returns whether the drone is close enough to its expected position during a show.
@@ -913,13 +970,12 @@ private:
 
     // Requests the vehicle to switch to drone show mode.
     virtual void _request_switch_to_show_mode() {};
+    
+    // Generic debug request handler
+    bool _run_debug_request_handler(const mavlink_command_int_t &packet) WARN_IF_UNUSED;
 
     bool _load_show_file_from_storage();
-    void _set_event_list_and_take_ownership(struct sb_event_list_s *value);
-    void _set_light_program_and_take_ownership(struct sb_light_program_s *value);
-    void _set_trajectory_and_take_ownership(struct sb_trajectory_s *value);
     void _set_show_data_and_take_ownership(uint8_t *value);
-    void _set_yaw_control_and_take_ownership(struct sb_yaw_control_s *value);
 
     // Triggers pending events from the event list of the show
     void _trigger_show_events();

@@ -1,7 +1,5 @@
 #include "AC_DroneShowManager.h"
 
-#include <skybrush/skybrush.h>
-
 #include <GCS_MAVLink/GCS.h>
 
 bool AC_DroneShowManager::get_global_takeoff_position(Location& loc) const
@@ -9,7 +7,7 @@ bool AC_DroneShowManager::get_global_takeoff_position(Location& loc) const
     // This function may be called any time, not only during the show, so we
     // need to take the parameters provided by the user, convert them into a
     // ShowCoordinateSystem object, and then use that to get the GPS coordinates
-    sb_vector3_with_yaw_t vec;
+    sb_vector3_t vec;
 
     if (!_tentative_show_coordinate_system.is_valid())
     {
@@ -46,9 +44,20 @@ float AC_DroneShowManager::get_takeoff_speed_m_sec() const {
     return result;
 }
 
-float AC_DroneShowManager::get_time_until_takeoff_sec() const
+float AC_DroneShowManager::get_time_until_takeoff_sec()
 {
-    return get_time_until_start_sec() + get_relative_takeoff_time_sec();
+    if (isnan(_projected_wall_clock_time_at_takeoff_sec)) {
+        _projected_wall_clock_time_at_takeoff_sec = sb_screenplay_get_time_sec_for_scene_tag_and_warped_time_in_scene(
+            &_screenplay, SceneTag_MainShow, _trajectory_stats.takeoff_time_sec
+        );
+        
+        if (isnan(_projected_wall_clock_time_at_takeoff_sec)) {
+            // This should not happen, but if it does, we just use infinity
+            _projected_wall_clock_time_at_takeoff_sec = INFINITY;
+        }
+    }
+
+    return get_time_until_start_sec() + _projected_wall_clock_time_at_takeoff_sec;
 }
 
 bool AC_DroneShowManager::is_prepared_to_take_off() const
@@ -80,7 +89,8 @@ bool AC_DroneShowManager::notify_takeoff_attempt()
         _trajectory_is_circular && !_trajectory_modified_for_landing
     ) {
         Location takeoff_location;
-        sb_vector3_with_yaw_t end;
+        sb_trajectory_t* trajectory;
+        sb_vector3_t end;
         float land_speed_mm_s;
 
         if (!get_current_location(takeoff_location))
@@ -89,14 +99,19 @@ bool AC_DroneShowManager::notify_takeoff_attempt()
         }
 
         _show_coordinate_system.convert_global_to_show_coordinate(takeoff_location, end);
+        
+        // Get a handle to the current trajectory from the show controller so we can
+        // modify its end point
+        trajectory = sb_screenplay_scene_get_trajectory(&_main_show_scene);
+        if (trajectory != nullptr)
+        {
+            land_speed_mm_s = get_landing_speed_m_sec() * 1000.0f;   /* [mm/s] */
+            if (sb_trajectory_replace_end_to_land_at(trajectory, &_trajectory_stats, end, land_speed_mm_s)) {
+                goto exit;
+            }
 
-        // TODO: query landing velocity from parameters
-        land_speed_mm_s = get_landing_speed_m_sec() * 1000.0f;   /* [mm/s] */
-        if (sb_trajectory_replace_end_to_land_at(_trajectory, _trajectory_stats, end, land_speed_mm_s)) {
-            goto exit;
+            _trajectory_modified_for_landing = true;
         }
-
-        _trajectory_modified_for_landing = true;
     }
 
 exit:

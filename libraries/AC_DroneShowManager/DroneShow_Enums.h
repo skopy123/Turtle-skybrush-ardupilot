@@ -23,7 +23,7 @@ enum DroneShowModeStage {
 // Enum representing the flags in the control mode bitmap
 enum DroneShowControlModeFlag {
     DroneShowControl_VelocityControlEnabled = 1,
-    DroneShowControl_AccelerationControlEnabled = 2,
+    DroneShowControl_AccelerationControlEnabledNotImplementedAnyMore = 2,
 };
 
 // Enum representing the authorization scopes for the start of the show
@@ -106,10 +106,18 @@ enum DroneShowEventResult : uint8_t {
 enum DroneShowOptionFlag {
     DroneShowOption_DisableFailsafeLights = 1,
     DroneShowOption_CorrectLandingPositionForCircularTrajectories = 2,
+    DroneShowOption_PreventMotorOutput = 4,
 };
 
 // Enum representing the telemetry profiles supported by the parameter set
 enum TelemetryProfile {
     TelemetryProfile_Standard = 0,
     TelemetryProfile_Compact = 1
+};
+
+// Enum containing the tags that we use to identify the main scene and the collective
+// RTH scene in the screenplay
+enum SceneTag {
+    SceneTag_MainShow = 1,
+    SceneTag_CRTH = 2
 };

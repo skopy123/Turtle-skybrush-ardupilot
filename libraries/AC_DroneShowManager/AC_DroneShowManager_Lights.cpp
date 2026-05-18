@@ -36,6 +36,10 @@ static float get_modulation_factor_for_light_effect(
     uint32_t timestamp, LightEffectType effect, uint16_t period_msec, uint16_t phase_msec
 );
 
+sb_rgb_color_t AC_DroneShowManager::get_rth_transition_color() const {
+    return Colors::ORANGE;
+}
+
 sb_rgb_color_t AC_DroneShowManager::get_desired_color_of_rgb_light() {
     float elapsed_time = get_elapsed_time_since_start_sec();
     if (elapsed_time >= 0) {
@@ -47,22 +51,16 @@ sb_rgb_color_t AC_DroneShowManager::get_desired_color_of_rgb_light() {
 
 sb_rgb_color_t AC_DroneShowManager::get_desired_color_of_rgb_light_at_seconds(float time)
 {
-    return sb_light_player_get_color_at(_light_player, time < 0 || time > 86400000 ? 0 : time * 1000);
-}
+    const sb_control_output_t* output = _get_raw_show_control_output_at_seconds(time);
+    sb_rgb_color_t result;
 
-uint32_t AC_DroneShowManager::_get_gps_synced_timestamp_in_millis_for_lights() const
-{
-    // No need to worry about loss of GPS fix; AP::gps().time_epoch_usec() is
-    // smart enough to extrapolate from the timestamp of the latest fix.
-    //
-    // Also no need to worry about overflow; AP::gps().time_epoch_usec() / 1000
-    // is too large for an uint32_t but it doesn't matter as we will truncate
-    // the high bits.
-    if (_is_gps_time_ok()) {
-        return AP::gps().time_epoch_usec() / 1000;
+    if (output && sb_control_output_get_color_if_set(output, &result)) {
+        return result;
     } else {
-        return AP_HAL::millis();
+        result = Colors::BLACK;
     }
+    
+    return result;
 }
 
 void AC_DroneShowManager::_flash_leds_after_failure()
@@ -366,12 +364,16 @@ void AC_DroneShowManager::_update_lights()
         light_signal_affected_by_brightness_setting = false;
 
         if (IS_RTL(mode)) {
-            // If we are flying and we are in RTL or smart RTL mode, blink with orange color
-            color = Colors::ORANGE;
+            // If we are flying and we are in RTL mode, blink with the preferred RTH
+            // color
+            color = get_rth_transition_color();
             pattern = BLINK;
             has_failsafe_color = true;
         } else if (IS_LANDING(mode)) {
-            // If we are flying and we are in landing mode, show a solid orange color
+            // If we are flying and we are in landing mode, show a solid orange color.
+            // This is not controlled by get_rth_transition_color() because we want to
+            // see the drone during landing even if the RTH color is configured to be
+            // dark.
             color = Colors::ORANGE;
             has_failsafe_color = true;
         } else if (mode == MODE_DRONE_SHOW) {
@@ -455,7 +457,7 @@ void AC_DroneShowManager::_update_lights()
                 color = Colors::YELLOW;
                 pulse = 0.5;
             } else if (has_authorization()) {
-                if (get_time_until_landing_sec() < 0) {
+                if (is_performance_completed()) {
                     // if we have already landed but show mode is reset from
                     // another mode, we just keep calm with solid green
                     color = Colors::GREEN_DIM;
@@ -698,4 +700,3 @@ static float get_modulation_factor_for_light_effect(
             return 0.0;
     }
 }
-

@@ -128,8 +128,8 @@ const AP_Param::GroupInfo AC_DroneShowManager::var_info[] = {
     // @Param: CTRL_MODE
     // @DisplayName: Flags to configure the show position control algorithm
     // @Description: Controls various aspects of the position control algorithm built into the firmware
-    // @Values: 3:Position/velocity/acceleration control,1:Position and velocity control,0:Position control only
-    // @Bitmask: 0:Velocity control,1:Acceleration control
+    // @Values: 1:Position and velocity control,0:Position control only
+    // @Bitmask: 0:Enable velocity control,1:Unused (was acceleration control)
     // @User: Advanced
     AP_GROUPINFO("CTRL_MODE", 11, AC_DroneShowManager, _params.control_mode_flags, DroneShowControl_VelocityControlEnabled),
 
@@ -299,7 +299,7 @@ const AP_Param::GroupInfo AC_DroneShowManager::var_info[] = {
     // @Param: OPTIONS
     // @DisplayName: Show flight mode options
     // @Description: General options related to the show flight mode
-    // @Bitmask: 0:Disable failsafe lights, 1:Attempt to adjust the landing segment of circular trajectories to land at the exact takeoff position
+    // @Bitmask: 0:Disable failsafe lights, 1:Attempt to adjust the landing segment of circular trajectories to land at the exact takeoff position, 2:Prevent motor output in show mode (for testing purposes only)
     // @User: Advanced
     AP_GROUPINFO("OPTIONS", 37, AC_DroneShowManager, _params.show_options, 0),
 

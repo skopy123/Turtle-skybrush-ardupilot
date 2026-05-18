@@ -37,21 +37,3 @@ float AC_DroneShowManager::get_landing_speed_m_sec() const {
 
     return DEFAULT_LANDING_SPEED_METERS_PER_SEC;
 }
-
-void AC_DroneShowManager::_clear_start_time_after_landing()
-{
-    _params.start_time_gps_sec.set(-1);
-    _start_time_on_internal_clock_usec = 0;
-    _check_changes_in_parameters();
-}
-
-void AC_DroneShowManager::_handle_switch_to_landed_state()
-{
-    _cancel_requested = false;
-
-    // Let's not clear the start time; there's not really much point but at
-    // least we don't confuse the GCS (not Skybrush but Mission Planner) with
-    // a parameter suddenly changing behind its back. This is just a theoretical
-    // possibility but let us be on the safe side.
-    // _clear_start_time_after_landing();
-}

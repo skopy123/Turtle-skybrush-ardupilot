@@ -1,8 +1,10 @@
 #include <GCS_MAVLink/GCS.h>
+#include <skybrush/skybrush.h>
 
 #include "AC_DroneShowManager.h"
 #include "DroneShow_Constants.h"
 #include "DroneShow_CustomPackets.h"
+#include "DroneShow_Enums.h"
 #include "DroneShowPyroDevice.h"
 
 MAV_RESULT AC_DroneShowManager::handle_command_int_packet(const mavlink_command_int_t &packet)
@@ -111,6 +113,9 @@ MAV_RESULT AC_DroneShowManager::handle_command_int_packet(const mavlink_command_
             } else {
                 return MAV_RESULT_FAILED;
             }
+        } else if (is_equal(packet.param1, 1.0f)) {
+            // Reserved for debugging purposes
+            return _run_debug_request_handler(packet) ? MAV_RESULT_ACCEPTED : MAV_RESULT_FAILED;
         }
 
         // Unsupported command code
@@ -210,21 +215,9 @@ bool AC_DroneShowManager::_handle_custom_data_message(mavlink_channel_t chan, ui
             }
             break;
 
-        // Schedule collective RTL
-        case CustomPackets::CRTL_TRIGGER:
-            if (length >= sizeof(CustomPackets::crtl_trigger_t)) {
-                CustomPackets::crtl_trigger_t* crtl_trigger = static_cast<CustomPackets::crtl_trigger_t*>(data);
-                if (crtl_trigger->start_time == 0) {
-                    clear_scheduled_collective_rtl();
-                } else if (crtl_trigger->start_time > 0) {
-                    schedule_collective_rtl_at_show_timestamp_msec(
-                        crtl_trigger->start_time * 1000 /* [s] --> [msec] */
-                    );
-                }
-
-                return true;
-            }
-            break;
+        // Schedule collective RTL; obsolete, does nothing, kept for backward compatibility
+        case CustomPackets::DEPRECATED_CRTL_TRIGGER:
+            return true;
 
         // Configure geofences with a single call
         case CustomPackets::SIMPLE_GEOFENCE_SETUP:
@@ -273,6 +266,11 @@ bool AC_DroneShowManager::_handle_custom_data_message(mavlink_channel_t chan, ui
             if (length >= sizeof(CustomPackets::acknowledgment_t)) {
                 return true;
             }
+            break;
+            
+        // Time axis configuration packet, used to implement suspension and resume
+        case CustomPackets::TIME_AXIS_CONFIG:
+            return _handle_time_axis_configuration_packet(data, length);
     }
 
     return false;
@@ -316,4 +314,280 @@ bool AC_DroneShowManager::_handle_data96_message(mavlink_channel_t chan, const m
         return false;
     }
     return _handle_custom_data_message(chan, packet.data[0], packet.data + 1, packet.len - 1);
+}
+
+bool AC_DroneShowManager::_handle_time_axis_configuration_packet(void* data, uint8_t length)
+{
+    CustomPackets::time_axis_config_header_t* header;
+    CustomPackets::time_axis_config_scene_header_t* scene_header;
+    CustomPackets::time_axis_config_scene_entry_t* entry;
+    uint64_t epoch_msec;
+    uint8_t num_scenes, num_entries, scene_index, entry_index;
+    uint8_t *ptr, *end;
+    sb_screenplay_t new_screenplay;
+    sb_screenplay_scene_t *scene;
+    sb_time_axis_t* time_axis;
+    sb_time_segment_t segment;
+    bool success;
+
+    if (length < sizeof(CustomPackets::time_axis_config_header_t)) {
+        // Packet too short - even with no scenes the packet must be at least this long
+        return false;
+    }
+
+    header = static_cast<CustomPackets::time_axis_config_header_t*>(data);
+    num_scenes = header->num_scenes;
+    
+    if (length < (
+        sizeof(CustomPackets::time_axis_config_header_t) +
+        num_scenes * sizeof(CustomPackets::time_axis_config_scene_header_t)
+    )) {
+        // Packet too short - even with no segments in each of the scenes the packet
+        // must be at least this long
+        return false;
+    }
+    
+    if (header->seq_no == _last_time_axis_config_seq_no) {
+        // Duplicate packet
+        return true;
+    }
+    
+    if (
+        _last_time_axis_config_seq_no <= 0xFF &&
+        (header->seq_no - static_cast<uint8_t>(_last_time_axis_config_seq_no) >= 0xF0)
+    ) {
+        // Probably the packets are being sent on two or more redundant channels and
+        // we are receiving them out-of-order
+        return true;
+     }
+
+    // Figure out the epoch relative to which all origin fields in the packet will be
+    // interpreted
+    if (uses_gps_time_for_show_start()) {
+        // When using GPS time for show start, the origin is assumed to be an absolute
+        // time in milliseconds since the UNIX epoch, written in the header, and we
+        // use this to update the SHOW_START_TIME parameter.
+        epoch_msec = header->start_time_msec;
+        if (epoch_msec > 0) {
+            // Start time set, but we need to convert from milliseconds to seconds
+            // since the start of the GPS week
+            _params.start_time_gps_sec.set(
+                ((epoch_msec - UNIX_OFFSET_MSEC) % AP_MSEC_PER_WEEK) / 1000
+            );
+        } else {
+            // Start time not set
+            _params.start_time_gps_sec.set(-1);
+        }
+    } else {
+        // When using the internal clock for show start, the origin is assumed to be
+        // relative to the show start time. This is not really recommended but we need
+        // to handle it nevertheless.
+        epoch_msec = 0;
+    }
+    
+    // Remember the sequence number
+    _last_time_axis_config_seq_no = header->seq_no;
+    
+    // We need to be extra careful here; if an error happens while we are setting up the
+    // new scenes, we want to leave the existing screenplay intact. Therefore, we first
+    // create a new screenplay, and then swap it with the existing one only if everything
+    // went well.
+    if (sb_screenplay_init(&new_screenplay) != SB_SUCCESS) {
+        return false;
+    }
+    
+    // From this point onwards we need to clean up the new screenplay if anything
+    // goes wrong, so we can't return directly -- we need to jump to the exit label
+    // instead. We use the 'success' variable to decide whether everything went well
+    // (in which case we need to swap the new screenplay with the old one and destroy
+    // the old one) or something went wrong (in which case we just destroy the new
+    // screenplay and leave the old one intact).
+    success = false;
+    
+    // Make sure that the new screenplay refers to the same RTH plan as the existing one
+    sb_screenplay_set_rth_plan(&new_screenplay, sb_screenplay_get_rth_plan(&_screenplay));
+    
+    // Header processed; now process each of the scenes
+    ptr = reinterpret_cast<uint8_t*>(data);
+    end = ptr + length;
+    ptr += sizeof(CustomPackets::time_axis_config_header_t);
+
+    for (scene_index = 0; scene_index < num_scenes; scene_index++) {
+        if (ptr + sizeof(CustomPackets::time_axis_config_scene_header_t) > end) {
+            // Packet too short
+            goto exit;
+        }
+        
+        scene_header = reinterpret_cast<CustomPackets::time_axis_config_scene_header_t*>(ptr);
+        ptr += sizeof(CustomPackets::time_axis_config_scene_header_t);
+        
+        // Add a new scene to the screenplay
+        if (sb_screenplay_append_new_scene(&new_screenplay, &scene) != SB_SUCCESS) {
+            // Could not add new scene
+            goto exit;
+        }
+        
+        // Check the scene ID and figure out whether this scene is for the main show
+        // or for a coordinated RTH plan
+        if (scene_header->scene_id == 0) {
+            // Main show
+            sb_screenplay_scene_set_tag(scene, SceneTag_MainShow);
+            sb_screenplay_scene_update_contents_from(scene, &_main_show_scene);
+        } else if ((scene_header->scene_id & 0xC000) == 0xC000) {
+            // Coordinated RTH plan, starting at the number of seconds described by the 
+            // lower 14 bits
+            sb_rth_plan_t* rth_plan = sb_screenplay_get_rth_plan(&new_screenplay);
+            sb_rth_plan_entry_t rth_plan_entry;
+            float rth_start_time = static_cast<float>(scene_header->scene_id & 0x3FFF);
+            if (rth_plan == NULL || sb_rth_plan_evaluate_at(rth_plan, rth_start_time, &rth_plan_entry) != SB_SUCCESS) {
+                // Could not evaluate RTH plan at the given time
+                goto exit;
+            }
+            
+            // Update scene tag to mark it as a CRTH scene
+            sb_screenplay_scene_set_tag(scene, SceneTag_CRTH);
+
+            // rth_plan_entry contains the start time of the RTH plan, but we don't
+            // need that -- we want to create a trajectory that starts at T=0 in
+            // show clock because the clock of the new RTH scene starts from 0
+            rth_plan_entry.time_sec = 0.0f;
+
+            // Create a trajectory based on rth_plan_entry and set it to the scene
+            {
+                sb_trajectory_t* rth_trajectory = sb_trajectory_new();
+                sb_trajectory_player_t player;
+                sb_vector3_with_yaw_t start_with_yaw;
+                sb_vector3_t start;
+                
+                if (rth_trajectory == nullptr) {
+                    // Out of memory
+                    goto exit;
+                }
+                
+                if (_show_controller.trajectory_player == nullptr) {
+                    // should not happen
+                    goto exit;
+                }
+                
+                if (sb_trajectory_player_clone(&player, _show_controller.trajectory_player) != SB_SUCCESS) {
+                    // should not happen
+                    goto exit;
+                }
+                
+                if (sb_trajectory_player_get_position_at(&player, rth_start_time, &start_with_yaw) != SB_SUCCESS) {
+                    // should not happen
+                    sb_trajectory_player_destroy(&player);
+                    goto exit;
+                }
+                
+                start.x = start_with_yaw.x;
+                start.y = start_with_yaw.y;
+                start.z = start_with_yaw.z;
+                if (sb_trajectory_update_from_rth_plan_entry(rth_trajectory, &rth_plan_entry, start) != SB_SUCCESS) {
+                    // Could not create RTH plan trajectory
+                    sb_trajectory_player_destroy(&player);
+                    SB_DECREF(rth_trajectory);
+                    goto exit;
+                }
+
+                sb_screenplay_scene_set_trajectory(scene, rth_trajectory);
+                SB_DECREF(rth_trajectory);
+
+                sb_trajectory_player_destroy(&player);
+                
+                // Log the details of the CRTH trigger for debugging purposes
+                write_crth_trigger_log_message(rth_start_time, start);
+            }
+            
+            // Use a fixed light program with RTH color
+            {
+                sb_light_program_t* rth_light_program = sb_light_program_new();
+                if (rth_light_program) {
+                    if (sb_light_program_set_constant_color(rth_light_program, get_rth_transition_color()) != SB_SUCCESS) {
+                        // Probably out of memory; clean up and proceed without setting
+                        // a light program
+                        SB_DECREF(rth_light_program);
+                        rth_light_program = nullptr;
+                    }
+                } else {
+                    // Out of memory; proceed without setting a light program
+                }
+                sb_screenplay_scene_set_light_program(scene, rth_light_program);
+                SB_XDECREF(rth_light_program);
+            }
+        } else {
+            // Unknown scene ID; may be used in the future but it has no meaning now
+            goto exit;
+        }
+
+        num_entries = scene_header->num_entries;
+    
+        // Find the time axis to manipulate
+        time_axis = scene ? sb_screenplay_scene_get_time_axis(scene) : nullptr;
+        if (time_axis == nullptr) {
+            // Could not get time axis; this should not happen but let's be defensive
+            goto exit;
+        }
+        
+        // First, we set the origin of the new time axis
+        sb_time_axis_set_origin_msec(time_axis, scene_header->origin_msec);
+        
+        // Add segments
+        for (entry_index = 0; entry_index < num_entries; entry_index++) {
+            if (ptr + sizeof(CustomPackets::time_axis_config_scene_entry_t) > end) {
+                // Packet too short
+                goto exit;
+            }
+            
+            entry = reinterpret_cast<CustomPackets::time_axis_config_scene_entry_t*>(ptr);
+            ptr += sizeof(CustomPackets::time_axis_config_scene_entry_t);
+    
+            if (entry->duration_msec == 0) {
+                if (!_ensure_scene_covers_relevant_part_of_trajectory(
+                    scene, entry->initial_rate_scaled / 65535.0f,
+                    entry->final_rate_scaled / 65535.0f
+                )) {
+                    goto exit;
+                }
+            } else {
+                segment = sb_time_segment_make(
+                    entry->duration_msec,
+                    entry->initial_rate_scaled / 65535.0f,
+                    entry->final_rate_scaled / 65535.0f
+                );
+    
+                if (sb_time_axis_append_segment(time_axis, segment) != SB_SUCCESS) {
+                    goto exit;
+                }
+            }
+        }
+        
+        // Finally, set total duration of scene to be the duration of its segments on
+        // the time axis
+        sb_screenplay_scene_set_duration_msec(scene, sb_time_axis_get_total_duration_msec(time_axis));
+    }
+
+    success = true;
+
+exit:
+    if (success) {
+        // Clean up the old screenplay and replace it with the new one
+        sb_screenplay_destroy(&_screenplay);
+        _screenplay = new_screenplay;
+        
+        // Notify the show controller that the screenplay has been updated
+        sb_show_controller_notify_screenplay_changed(&_show_controller);
+
+        // Invalidate the projected takeoff time because it depends on the screenplay.
+        // It will be realculated later if needed.
+        _invalidate_projected_wall_clock_time_at_takeoff();
+
+        // Add log entries containing the current screenplay
+        write_screenplay_log_messages();
+    } else {
+        // Clean up the new screenplay that we tried to prepare
+        sb_screenplay_destroy(&new_screenplay);
+    }
+    
+    return success;
 }

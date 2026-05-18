@@ -1,3 +1,4 @@
+#include "AC_DroneShowManager/AC_DroneShowManager.h"
 #include "Copter.h"
 
 #include <skybrush/colors.h>
@@ -66,16 +67,11 @@ bool ModeDroneShow::allows_arming(AP_Arming::Method method) const
         // by the user
         method == AP_Arming::Method::MAVLINK || (
             copter.g2.drone_show_manager.loaded_show_data_successfully() &&
-            copter.g2.drone_show_manager.has_valid_takeoff_time() &&
+            copter.g2.drone_show_manager.is_trajectory_plausible() &&
             copter.g2.drone_show_manager.has_explicit_show_origin_set_by_user() &&
             copter.g2.drone_show_manager.has_explicit_show_orientation_set_by_user()
         )
     );
-}
-
-bool ModeDroneShow::cancel_requested() const
-{
-    return copter.g2.drone_show_manager.cancel_requested();
 }
 
 // Handles the takeoff command when sent from the GCS. This can be used for
@@ -336,7 +332,10 @@ void ModeDroneShow::initialization_start()
     notify_start_time_changed();
 
     // Notify the drone show manager that the drone show mode was initialized
-    copter.g2.drone_show_manager.notify_drone_show_mode_initialized();
+    if (!copter.g2.drone_show_manager.notify_drone_show_mode_initialized()) {
+        // Something went wrong during initialization; move to error state
+        error_start();
+    }
 }
 
 // initializes the drone show mode after it has been activated the first time
@@ -372,6 +371,13 @@ void ModeDroneShow::wait_for_start_time_run()
     float time_until_takeoff_sec = show_manager.get_time_until_takeoff_sec();
     float time_since_takeoff_sec = -time_until_takeoff_sec;
     const float latest_takeoff_attempt_after_scheduled_takeoff_time_in_seconds = 5.0f;
+
+    if (show_manager.is_collective_rth_triggered()) {
+        // if collective RTH was triggered, we should not continue with the
+        // takeoff but rather land immediately
+        landing_start();
+        return;
+    }
 
     // Drone is in standby so keep all I terms in controllers at zero
     attitude_control->reset_yaw_target_and_rate();
@@ -490,6 +496,7 @@ void ModeDroneShow::wait_for_start_time_run()
 // starts the phase where we are taking off at the start of the show
 void ModeDroneShow::takeoff_start()
 {
+    AC_DroneShowManager_Copter& show_manager = copter.g2.drone_show_manager;
     Location current_loc(copter.current_loc);
     int32_t current_alt, target_alt;
 
@@ -508,7 +515,7 @@ void ModeDroneShow::takeoff_start()
     // show manager _may_ cancel the takeoff if it deems that the drone is not
     // prepared for takeoff (e.g., the show origin or orientation was not
     // configured)
-    if (!copter.g2.drone_show_manager.notify_takeoff_attempt())
+    if (!show_manager.notify_takeoff_attempt())
     {
         gcs().send_text(MAV_SEVERITY_CRITICAL, "Takeoff cancelled by show manager");
         AP::logger().Write_Error(LogErrorSubsystem::NAVIGATION, LogErrorCode::FAILED_TO_INITIALISE);
@@ -528,9 +535,14 @@ void ModeDroneShow::takeoff_start()
     // now that we are past the basic checks, we can commit ourselves to entering
     // takeoff mode
     _set_stage(DroneShow_Takeoff);
+    
+    // early exit if the motor output is prevented
+    if (show_manager.is_motor_output_disabled()) {
+        return;
+    }
 
     // set the target altitude of the takeoff
-    target_alt = current_alt + copter.g2.drone_show_manager.get_takeoff_altitude_cm();
+    target_alt = current_alt + show_manager.get_takeoff_altitude_cm();
 
     // the body of this function from here on is mostly adapted from
     // ModeAuto::takeoff_start()
@@ -538,7 +550,7 @@ void ModeDroneShow::takeoff_start()
     // clear I term when we're taking off
     pos_control->init_z_controller();
 
-    // initialise alt for WP_NAVALT_MIN and set completion alt
+    // initialise alt for WP_NAVALT_MIN and set completion altitude.
     auto_takeoff.start(target_alt, /* terrain_alt = */ false);
 
     // part adapted from ModeAuto::takeoff_start() ends here
@@ -575,21 +587,32 @@ void ModeDroneShow::takeoff_start()
 // performs the takeoff stage
 void ModeDroneShow::takeoff_run()
 {
+    AC_DroneShowManager_Copter& show_manager = copter.g2.drone_show_manager;
     bool completed = false;
-
-    auto_takeoff.run();
-
-    if (cancel_requested()) {
-        // if a cancellation was requested, land immediately
+    
+    if (show_manager.is_collective_rth_triggered()) {
+        // if collective RTH was triggered, we should not continue with the
+        // takeoff but rather land immediately
         landing_start();
-    } else if (!motors->armed()) {
-        // if the motors are not armed any more, something is wrong so move to the
-        // error stage. This typically happens if we crash during takeoff.
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "Motors disarmed during takeoff");
-        error_start();
-    } else if (takeoff_completed()) {
-        // if the takeoff has finished, move to the next stage
+        return;
+    }
+
+    if (show_manager.is_motor_output_disabled()) {
+        // if the motor output is prevented, move on to the performing stage as soon as
+        // possible
         completed = true;
+    } else {
+        auto_takeoff.run();
+    
+        if (!motors->armed()) {
+            // if the motors are not armed any more, something is wrong so move to the
+            // error stage. This typically happens if we crash during takeoff.
+            gcs().send_text(MAV_SEVERITY_CRITICAL, "Motors disarmed during takeoff");
+            error_start();
+        } else if (takeoff_completed()) {
+            // if the takeoff has finished, move to the next stage
+            completed = true;
+        }
     }
 
     if (completed) {
@@ -647,8 +670,12 @@ bool ModeDroneShow::takeoff_completed() const
                     // Altitude above home seems high enough, but is the trajectory
                     // already ahead of us?
                     float elapsed = show_manager->get_elapsed_time_since_start_sec();
-                    show_manager->get_desired_global_position_at_seconds(elapsed, loc);
-                    if (loc.get_alt_cm(Location::AltFrame::ABOVE_HOME, desired_altitude_above_home_cm))
+                    if (!show_manager->get_desired_global_position_at_seconds(elapsed, loc))
+                    {
+                        // Unable to get desired position, this should not happen
+                        return false;
+                    }
+                    else if (loc.get_alt_cm(Location::AltFrame::ABOVE_HOME, desired_altitude_above_home_cm))
                     {
                         // If the desired target is above our current altitude,
                         // we can go to the next stage, otherwise we wait until
@@ -730,35 +757,37 @@ void ModeDroneShow::performing_start()
 // executes the show performance
 void ModeDroneShow::performing_run()
 {
-    static uint32_t last_guided_command = 0;
-    bool exited_mode = 0;
+    static uint32_t last_guided_command_attempted_at = 0;
+    bool should_exit_mode = 0;
     uint32_t now = AP_HAL::millis();
-    uint32_t target_dt = copter.g2.drone_show_manager.get_controller_update_delta_msec();
+    AC_DroneShowManager* show_manager = &copter.g2.drone_show_manager;
+    uint32_t target_dt = show_manager->get_controller_update_delta_msec();
 
-    if (now - last_guided_command >= target_dt) {
+    if (now - last_guided_command_attempted_at >= target_dt) {
         if (!send_guided_mode_command_during_performance()) {
-            // Failed to send guided mode command; try to switch to position
-            // hold instead. This should not happen anyway.
-            gcs().send_text(MAV_SEVERITY_ERROR, "Failed to send guided mode command");
-            loiter_start();
-            exited_mode = 1;
+            // Failed to send guided mode command. The function has set up a neutral
+            // position hold target, so we will log the failure, execute the target and
+            // then switch to position hold mode. (We can't switch now to avoid an
+            // ArduCopter flow_of_control internal error).
+            gcs().send_text(MAV_SEVERITY_ERROR, "Failed to send guided mode command");            
+            should_exit_mode = 1;
         }
-        last_guided_command = now;
-    }
 
+        last_guided_command_attempted_at = now;
+    }
+    
     // call regular guided flight mode run function
-    if (!exited_mode) {
-        copter.mode_guided.run();
-    }
+    copter.mode_guided.run();
 
-    if (cancel_requested()) {
-        // if a cancellation was requested, return to home and then land
-        rtl_start();
-    } else if (!motors->armed()) {
+    if (!show_manager->is_motor_output_disabled() && !motors->armed()) {
         // if the motors are not armed any more, something is wrong so move to the
         // error stage. This typically happens if we crash during a show.
         gcs().send_text(MAV_SEVERITY_CRITICAL, "Motors disarmed during show");
         error_start();
+    } else if (should_exit_mode) {
+        // switch to position hold mode because the last attempt to send a guided mode
+        // command failed
+        loiter_start();
     } else if (performing_completed()) {
         // if we have finished the show, check the configured post-show action
         // and switch to RTL, position hold or land
@@ -784,7 +813,7 @@ void ModeDroneShow::performing_run()
 
 bool ModeDroneShow::performing_completed() const
 {
-    return copter.g2.drone_show_manager.get_time_until_landing_sec() <= 0;
+    return copter.g2.drone_show_manager.is_performance_completed();
 }
 
 // starts the phase where we are landing at the place where we are, used at
@@ -956,7 +985,7 @@ void ModeDroneShow::light_testing_run()
 // returns whether we should exit the light testing mode
 bool ModeDroneShow::light_testing_completed() const
 {
-    return copter.g2.drone_show_manager.get_time_until_landing_sec() <= 0;
+    return copter.g2.drone_show_manager.is_performance_completed();
 }
 
 // Handler function that is called when the authorization state of the show has
@@ -989,27 +1018,47 @@ void ModeDroneShow::notify_start_time_changed()
 bool ModeDroneShow::send_guided_mode_command_during_performance()
 {
     AC_DroneShowManager::GuidedModeCommand command;
+    AC_DroneShowManager* show_manager = &copter.g2.drone_show_manager;
+    Vector3f pos, zero;
 
-    if (copter.g2.drone_show_manager.get_current_guided_mode_command_to_send(
+    if (show_manager->get_current_guided_mode_command_to_send(
         command, get_default_yaw_cd(),
         _altitude_locked_above_takeoff_altitude
     )) {
-        copter.mode_guided.set_destination_posvelaccel(
-            command.pos, command.vel, command.acc,
-            /* use_yaw = */ true,
-            command.yaw_cd, /* [cd] */
-            /* use_yaw_rate = */ true,
-            command.yaw_rate_cds  /* [cd/s] */
-        );
+        if (command.reached_end) {
+            // Nothing to do, we have reached the end and we will switch to the
+            // next stage soon
+        } else {
+            // Send the generated command -- unless the motor output is prevented in
+            // the show manager, in which case we just _pretend_ that the command was
+            // sent but we don' actually do anything
+            if (!show_manager->is_motor_output_disabled()) {
+                copter.mode_guided.set_destination_posvelaccel(
+                    command.pos, command.vel, command.acc,
+                    /* use_yaw = */ true,
+                    command.yaw_cd, /* [cd] */
+                    /* use_yaw_rate = */ true,
+                    command.yaw_rate_cds  /* [cd/s] */
+                );
+            }
+
+            show_manager->notify_guided_mode_command_sent(command);
+        }
 
         if (command.unlock_altitude) {
             _altitude_locked_above_takeoff_altitude = false;
         }
 
-        copter.g2.drone_show_manager.notify_guided_mode_command_sent(command);
-
         return true;
     } else {
+        // Send a zero-velocity command to stop the drone -- this is really just
+        // to prevent an internal "flow of control" error before we actually
+        // switch to loiter mode
+        if (show_manager->get_current_relative_position_NED_origin(pos)) {
+            zero.zero();
+            copter.mode_guided.set_destination_posvelaccel(pos, zero, zero);
+        }
+
         return false;
     }
 }
@@ -1019,8 +1068,12 @@ bool ModeDroneShow::send_guided_mode_command_during_performance()
 bool ModeDroneShow::start_motors_if_not_running()
 {
     bool success = false;
-
-    if (AP::arming().is_armed()) {
+    
+    if (copter.g2.drone_show_manager.is_motor_output_disabled()) {
+        // Motor output is disabled by the show manager; pretend that we have started
+        // the motors successfully 
+        success = true;
+    } else if (AP::arming().is_armed()) {
         // Already armed
         success = true;
     } else if (_prevent_arming_until_msec > AP_HAL::millis()) {
