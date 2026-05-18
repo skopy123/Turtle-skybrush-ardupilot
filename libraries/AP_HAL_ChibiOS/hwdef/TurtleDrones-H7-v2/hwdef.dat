@@ -1,11 +1,11 @@
 # hw definition file for processing by chibios_pins.py
-# for AP_HW_TurtleDrones_H7_v1 (cover name TD mowerBaseBoard v1)
+# for AP_HW_TurtleDrones_H7_v2 (cover name TD mowerBaseBoard v2)
 
 # MCU class and specific type
 MCU STM32H7xx STM32H743xx
 
 # board ID. See Tools/AP_Bootloader/board_types.txt
-APJ_BOARD_ID AP_HW_TurtleDrones_H7_v1
+APJ_BOARD_ID AP_HW_TurtleDrones_H7_v2
 
 # crystal frequency, setup to use external oscillator
 OSCILLATOR_HZ 8000000
@@ -40,16 +40,14 @@ PB2 IMU1_CS CS PULLUP
 PB3 SPI3_SCK SPI3
 PB4 SPI3_MISO SPI3
 PB5 SPI3_MOSI SPI3
-# PD4 FRAM_CS CS
-# bug na v1 PCB, pouzit PD3 pro CS
-PD3 FRAM_CS CS PULLUP
+# fix against v1 (it uses PD3), v2 has CS on pin PD4
+PD4 FRAM_CS CS PULLUP 
 
 # SPI4 for IMU2 (icm42688)
 PE12 SPI4_SCK SPI4
 PE13 SPI4_MISO SPI4
 PE14 SPI4_MOSI SPI4
 PE11 IMU2_CS CS PULLUP
-
 
 # logging broke down mavlink connection over OTG1, not sure which one
 #define HAL_LOGGING_ENABLED 1
@@ -175,12 +173,6 @@ PD15 TIM4_CH4 TIM4 PWM(8) GPIO(59) #W
 PB0  TIM8_CH2N TIM8  PWM(9)  GPIO(50)
 PB1  TIM8_CH3N TIM8  PWM(10)  GPIO(51)
 
-# not connected
-# PA8 TIM1_CH1 TIM1 PWM(13) GPIO(62) # for WS2812 LED on original matek h743 
-
-# Beeper
-# PA15 TIM2_CH1 TIM2 GPIO(32) ALARM
-
 # microSD support - ok
 PC8 SDMMC1_D0 SDMMC1
 PC9 SDMMC1_D1 SDMMC1
@@ -194,7 +186,6 @@ PD2 SDMMC1_CMD SDMMC1
 #PD11  PINIO2 OUTPUT GPIO(82) LOW
 
 DMA_PRIORITY S*
-
 
 # enable RAMTROM parameter storage
 define HAL_STORAGE_SIZE 16384

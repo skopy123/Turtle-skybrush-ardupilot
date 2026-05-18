@@ -503,7 +503,8 @@ AP_HW_IOMCU_F100                     5713
 
 # turtleDrones 5721-5730
 AP_HW_WEACTH743                      5721    
-AP_HW_TurtleDrones_H7_v1             5722               
+AP_HW_TurtleDrones_H7_v1             5722
+AP_HW_TurtleDrones_H7_v2             5723               
 
 #IDs 5800-5809 reserved for Droneer
 AP_HW_DroneerF405                    5800

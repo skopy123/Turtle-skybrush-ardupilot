@@ -1,0 +1,82 @@
+# hw definition file for processing by chibios_pins.py
+# for AP_HW_TurtleDrones_H7_v1
+
+# MCU class and specific type
+MCU STM32H7xx STM32H743xx
+
+# board ID. See Tools/AP_Bootloader/board_types.txt
+APJ_BOARD_ID AP_HW_TurtleDrones_H7_v1
+
+# crystal frequency, setup to use external oscillator
+OSCILLATOR_HZ 8000000
+
+FLASH_SIZE_KB 2048
+
+# bootloader starts at zero offset
+FLASH_RESERVE_START_KB 0
+
+# the location where the bootloader will put the firmware
+# the H743 has 128k sectors
+FLASH_BOOTLOADER_LOAD_KB 128
+
+
+# order of UARTs (and USB). Allow bootloading on USB and telem1
+SERIAL_ORDER OTG1 UART7
+
+# UART7 (telem1)
+PE7 UART7_RX UART7 NODMA
+PE8 UART7_TX UART7 NODMA
+
+# PA10 IO-debug-console
+PA11 OTG_FS_DM OTG1
+PA12 OTG_FS_DP OTG1
+USB_STRING_MANUFACTURER "TurtleDrones-BL"
+
+PA13 JTMS-SWDIO SWD
+PA14 JTCK-SWCLK SWD
+
+# make sure Vsw is on during bootloader - no SW on board
+# PD10  PINIO1 OUTPUT LOW
+
+# LED on PE3 -red and 
+PE3 LED_BOOTLOADER OUTPUT LOW
+#PE4 - white
+PE4 LED_ACTIVITY OUTPUT LOW
+define HAL_LED_ON 0
+
+# Add CS pins to ensure they are high in bootloader
+PB2 IMU1_CS CS PULLUP
+PE11 IMU2_CS CS PULLUP
+#PD4 FRAM_CS CS PULLUP
+# fix against v1 (it uses PD3), v2 has CS on pin PD4
+PD4 FRAM_CS CS PULLUP 
+
+
+# support flashing from SD card:
+
+# FATFS support:
+define CH_CFG_USE_MEMCORE 1
+define CH_CFG_USE_HEAP 1
+define CH_CFG_USE_SEMAPHORES 0
+define CH_CFG_USE_MUTEXES 1
+define CH_CFG_USE_DYNAMIC 1
+define CH_CFG_USE_WAITEXIT 1
+define CH_CFG_USE_REGISTRY 1
+
+# microSD support
+PC8 SDMMC1_D0 SDMMC1
+PC9 SDMMC1_D1 SDMMC1
+PC10 SDMMC1_D2 SDMMC1
+PC11 SDMMC1_D3 SDMMC1
+PC12 SDMMC1_CK SDMMC1
+PD2 SDMMC1_CMD SDMMC1
+
+# enable FAT filesystem support (needs a microSD defined via SDMMC)
+define HAL_OS_FATFS_IO 1
+
+define AP_BOOTLOADER_FLASH_FROM_SD_ENABLED 1
+
+#ramtron tmp disable
+define HAL_USE_EMPTY_STORAGE 1
+# before there was 16K, 32k cause crash in bootloader
+define HAL_STORAGE_SIZE 16384
