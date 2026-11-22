@@ -1,6 +1,7 @@
 #pragma once
 
 #include <AP_Common/AP_Common.h>
+#include <cstddef>
 #include <cstdint>
 
 #include "DroneShow_Enums.h"
@@ -48,8 +49,16 @@ namespace CustomPackets {
         uint16_t gps_vdop;
 
         /* Show metadata */
-        uint32_t show_id;  // zero means "not known"
-        uint16_t trajectory_index;    // zero-based, 0xFFFF means "not known"
+        uint8_t show_id[4];  // binary blob from the show file; all zeros if not specified
+        uint16_t trajectory_index;    // zero-based; zero if not specified, 0xFFFF in older firmware
+
+        /* Hash of the show configuration; zero if not known. See
+         * AC_DroneShowManager::get_show_config_hash() */
+        uint32_t config_hash;
+
+        /* Wind estimate */
+        uint8_t wind_speed;       // 0 if not known, otherwise 1 + horizontal speed in 0.2 m/s units, at most 255
+        uint8_t wind_direction;   // direction the wind blows from, in 360/256 degree units, clockwise from North
     } drone_show_extended_status_t;
 
     typedef struct PACKED {
@@ -58,13 +67,19 @@ namespace CustomPackets {
         // currently set. Negative number means that the start time must be
         // cleared.
         int32_t start_time;
-        DroneShowAuthorization authorization;
+        uint8_t authorization;
 
         struct PACKED {
             // Countdown, i.e. number of milliseconds until the start of the show.
             // Positive number means that there is still some time left.
             int32_t countdown_msec;
-        } optional_part;
+        } v2_extended_part;
+
+        struct PACKED {
+            // Millisecond part of the start time. Only the 10 least significant bits
+            // are used.
+            uint16_t start_time_msec_offset;
+        } v3_extended_part;
     } start_config_t;
 
     typedef struct PACKED {

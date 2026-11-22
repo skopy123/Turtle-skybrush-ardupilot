@@ -444,10 +444,29 @@ void ModeDroneShow::wait_for_start_time_run()
 
         // Handle starting or stopping the motors depending on the authorization
         if (show_manager.has_authorization_to_start_motors()) {
-            if (time_until_takeoff_sec <= 8 && !_motors_started) {
-                // We attempt to start the motors 8 seconds before our takeoff time,
-                // and we keep on doing so until 5 seconds after the takeoff time, when
-                // we give up.
+            if (
+                _motors_started && !motors->armed() &&
+                AP::arming().last_disarm_method() == AP_Arming::Method::DISARMDELAY
+            ) {
+                // ArduCopter disarmed the motors because the drone was idling
+                // on the ground for too long, typically because the takeoff was
+                // postponed. Start them again in the usual way, before the
+                // takeoff
+                _motors_started = false;
+            }
+
+            if (_motors_started && time_until_takeoff_sec > get_auto_disarm_delay_sec()) {
+                // The takeoff was postponed (e.g., the show was suspended) so
+                // much that ArduCopter would disarm the motors anyway before
+                // the takeoff. Stop them now; they are started again before
+                // the new takeoff time
+                stop_motors_if_started();
+            }
+
+            if (time_until_takeoff_sec <= get_motor_start_lead_time_sec() && !_motors_started) {
+                // We attempt to start the motors 8 seconds before our takeoff time
+                // (or earlier with a short auto-disarm delay), and we keep on doing
+                // so until 5 seconds after the takeoff time, when we give up.
                 //
                 // No need to set the home position once again; arming the motors
                 // will reset AGL to zero.
@@ -473,13 +492,7 @@ void ModeDroneShow::wait_for_start_time_run()
             // may still be running in this case, but in this case they were
             // started by the operator with a MAVLink command for testing
             // purposes.
-            if (_motors_started) {
-                if (AP::arming().is_armed()) {
-                    AP::arming().disarm(AP_Arming::Method::SCRIPTING);
-                }
-
-                _motors_started = false;
-            }
+            stop_motors_if_started();
 
             // If we are authorized to test the lights, check whether it is
             // time to start the test
@@ -534,6 +547,7 @@ void ModeDroneShow::takeoff_start()
 
     // now that we are past the basic checks, we can commit ourselves to entering
     // takeoff mode
+    show_manager.notify_takeoff_started();
     _set_stage(DroneShow_Takeoff);
     
     // early exit if the motor output is prevented
@@ -592,8 +606,11 @@ void ModeDroneShow::takeoff_run()
     
     if (show_manager.is_collective_rth_triggered()) {
         // if collective RTH was triggered, we should not continue with the
-        // takeoff but rather land immediately
+        // takeoff but rather land immediately. The landing controller must
+        // run in this iteration as well, otherwise the position controller
+        // times out and raises a flow_of_control internal error
         landing_start();
+        landing_run();
         return;
     }
 
@@ -934,10 +951,10 @@ void ModeDroneShow::landed_run()
     if (has_start_time) {
         float time_until_start_sec = copter.g2.drone_show_manager.get_time_until_start_sec();
 
-        // The upper limit (43200 sec = 12 hours) is needed to cater for the
-        // case when the GCS sends us the _original_ start time of the show
-        // again (after landing) as it will then be interpreted in the next
-        // GPS week (since it is in the past in the current GPS week). We don't
+        // If the GCS sends us the _original_ start time of the show again
+        // (after landing), it is interpreted in the past so we stay here. The
+        // upper limit (43200 sec = 12 hours) is an extra safeguard against
+        // start times that end up far in the future for some reason; we don't
         // want to go back to the "waiting for start time" state in this case.
         if (time_until_start_sec > 10.0f && time_until_start_sec <= 43200.f) {
             initialization_start();
@@ -1087,6 +1104,40 @@ bool ModeDroneShow::start_motors_if_not_running()
     }
 
     return success;
+}
+
+// Returns the auto-disarm delay of ArduCopter (DISARM_DELAY) in seconds, or
+// infinity if auto-disarming is disabled. This is also the time until the
+// takeoff above which the motors started before the takeoff are stopped
+// because the takeoff was postponed, as ArduCopter would disarm them anyway
+// while waiting that long.
+float ModeDroneShow::get_auto_disarm_delay_sec() const
+{
+    const int16_t disarm_delay_sec = constrain_int16(copter.g.disarm_delay, 0, 127);
+    return disarm_delay_sec > 0 ? disarm_delay_sec : INFINITY;
+}
+
+// Returns how many seconds before the takeoff the motors are started. This is
+// 8 seconds, which is 80% of the recommended minimum auto-disarm delay of
+// 10 seconds. With a shorter auto-disarm delay, it is 80% of the delay so the
+// motors are not disarmed by ArduCopter while waiting for the takeoff.
+float ModeDroneShow::get_motor_start_lead_time_sec() const
+{
+    const float disarm_delay_sec = get_auto_disarm_delay_sec();
+    return disarm_delay_sec > 0 && disarm_delay_sec < 10 ? 0.8f * disarm_delay_sec : 8.0f;
+}
+
+// Stops the motors if they were started by this mode before the takeoff. Does
+// nothing if they were started by the operator, e.g., for testing purposes.
+void ModeDroneShow::stop_motors_if_started()
+{
+    if (_motors_started) {
+        if (AP::arming().is_armed()) {
+            AP::arming().disarm(AP_Arming::Method::SCRIPTING);
+        }
+
+        _motors_started = false;
+    }
 }
 
 // Starts the motors before the show if they are not running already, after

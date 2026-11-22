@@ -26,6 +26,11 @@ MAV_RESULT AC_DroneShowManager::handle_command_int_packet(const mavlink_command_
         //     bits in future versions and sacrifice higher group indices.
         //     param7 of the command is remapped to param1 of the injected command,
         //     while param7 in the injected command is always zero.
+        // 4 = set input source of LED light. param2 is the index of the light to
+        //     update (must be 0 at the moment as we only support one light).
+        //     param3 is the type of the input source (0 = fixed color, 1 = show,
+        //     2 = interactive pixel grid). param5 (x) is the RGB color of the light
+        //     if fixed mode is set, otherwise ignored.
         if (is_zero(packet.param1)) {
             // Reload current show
             if (reload_or_clear_show(/* do_clear = */ 0)) {
@@ -86,6 +91,33 @@ MAV_RESULT AC_DroneShowManager::handle_command_int_packet(const mavlink_command_
             } else {
                 return MAV_RESULT_ACCEPTED;
             }
+        } else if (is_equal(packet.param1, 4.0f)) {
+            // Set input source of LED light
+            if (!is_equal(packet.param2, 0.0f)) {
+                // We only support one light at the moment, so the index must be zero
+                return MAV_RESULT_UNSUPPORTED;
+            } else if (is_equal(packet.param3, 0.0f)) {
+                // Fixed color
+                // param5 (x) is the RGB color of the light
+                sb_rgb_color_t fixed_color = sb_rgb_color_make(
+                    static_cast<uint8_t>((packet.x >> 16) & 0xFF),
+                    static_cast<uint8_t>((packet.x >> 8) & 0xFF),
+                    static_cast<uint8_t>(packet.x & 0xFF)
+                );
+                _rgb_led_input.set_type(LightInputSource_Fixed);
+                _rgb_led_input.set_fixed_color(fixed_color);
+                return MAV_RESULT_ACCEPTED;
+            } else if (is_equal(packet.param3, 1.0f)) {
+                // Color from the light program
+                _rgb_led_input.set_type(LightInputSource_Show);
+                return MAV_RESULT_ACCEPTED;
+            } else if (is_equal(packet.param3, 2.0f)) {
+                // Interactive pixel grid
+                _rgb_led_input.set_type(LightInputSource_PixelGrid);
+                return MAV_RESULT_ACCEPTED;
+            } else {
+                return MAV_RESULT_FAILED;
+            }
         }
 
         // Unsupported command code
@@ -101,7 +133,7 @@ MAV_RESULT AC_DroneShowManager::handle_command_int_packet(const mavlink_command_
             // do not want to lose precision in the lat/lng direction due to
             // float representation
             //
-            // param4: orientation
+            // param4: orientation, must be between 0 and 360 degrees, -1 if unset
             // param5 (x): latitude (degE7)
             // param6 (y): longitude (degE7)
             // param7 (z): AMSL (mm)
@@ -154,6 +186,12 @@ bool AC_DroneShowManager::handle_message(mavlink_channel_t chan, const mavlink_m
             // GCS module.
             return _handle_led_control_message(msg);
 
+        case MAVLINK_MSG_ID_TUNNEL:
+            // Tunnel packets are used to pipe interactive GCS-based LED control
+            // commands to the drone. (LED_CONTROL is not enough because its payload
+            // is too small).
+            return _handle_tunnel_message(msg);
+
         default:
             return false;
     }
@@ -162,9 +200,16 @@ bool AC_DroneShowManager::handle_message(mavlink_channel_t chan, const mavlink_m
 bool AC_DroneShowManager::_handle_custom_data_message(mavlink_channel_t chan, uint8_t type, void* data, uint8_t length)
 {
     uint8_t reply[16];
+    bool handled = false;
+    bool needs_reply = false;
     
     if (data == nullptr) {
         return false;
+    }
+
+    needs_reply = (type == CustomPackets::SIMPLE_GEOFENCE_SETUP);
+    if (needs_reply) {
+        memset(reply, 0, sizeof(reply));
     }
 
     // We allocate type 0x5C for the GCS-to-drone packets (0X5B is the drone-to-GCS
@@ -175,105 +220,43 @@ bool AC_DroneShowManager::_handle_custom_data_message(mavlink_channel_t chan, ui
     switch (type) {
         // Broadcast start time and authorization state of the show
         case CustomPackets::START_CONFIG:
-            {
-                if (length < offsetof(CustomPackets::start_config_t, optional_part)) {
-                    // Packet too short
-                    return false;
-                }
-
-                CustomPackets::start_config_t* start_config = static_cast<CustomPackets::start_config_t*>(data);
-
-                // Update start time expressed in GPS time of week
-                if (start_config->start_time < 0) {
-                    _params.start_time_gps_sec.set(-1);
-                } else if (start_config->start_time < GPS_WEEK_LENGTH_SEC) {
-                    _params.start_time_gps_sec.set(start_config->start_time);
-                }
-
-                // Update authorization flag
-                _params.authorization.set(start_config->authorization);
-
-                // Do we have the optional second part?
-                if (length >= sizeof(CustomPackets::start_config_t)) {
-                    // Optional second part is used by the GCS to convey how many
-                    // milliseconds there are until the start of the show. If this
-                    // part exists and is positive, _and_ we are using the internal
-                    // clock to synchronize the start, then we update the start
-                    // time based on this
-                    if (!uses_gps_time_for_show_start()) {
-                        int32_t countdown_msec = start_config->optional_part.countdown_msec;
-
-                        if (countdown_msec < -GPS_WEEK_LENGTH_MSEC) {
-                            clear_scheduled_start_time();
-                        } else if (countdown_msec >= 0 && countdown_msec < GPS_WEEK_LENGTH_MSEC) {
-                            schedule_delayed_start_after(countdown_msec);
-                        }
-                    }
-                }
-
-                return true;
-            }
+            handled = _handle_start_time_configuration_packet(data, length);
             break;
 
         // Schedule collective RTL; obsolete, does nothing, kept for backward compatibility
         case CustomPackets::DEPRECATED_CRTL_TRIGGER:
-            return true;
+            handled = true;
+            break;
 
         // Configure geofences with a single call
         case CustomPackets::SIMPLE_GEOFENCE_SETUP:
-            if (length >= sizeof(CustomPackets::simple_geofence_setup_header_t)) {
-                CustomPackets::simple_geofence_setup_header_t* geofence_setup = static_cast<CustomPackets::simple_geofence_setup_header_t*>(data);
-                DroneShow_FenceConfig fence_config;
-                CustomPackets::acknowledgment_t* ack_packet = reinterpret_cast<CustomPackets::acknowledgment_t*>(reply + 1);
-                size_t points_payload_length_in_bytes = length - sizeof(CustomPackets::simple_geofence_setup_header_t);
-                size_t num_points = points_payload_length_in_bytes / sizeof(DroneShow_FencePoint);
-                MAV_RESULT result = MAV_RESULT_FAILED;
-
-                // Convert from geofence_setup to fence_config
-                fence_config.max_altitude_dm = geofence_setup->max_altitude_dm;
-                fence_config.radius_dm = geofence_setup->radius_dm;
-                fence_config.action = geofence_setup->flags & 0x0f;
-                fence_config.num_points = geofence_setup->num_points;
-                fence_config.points = reinterpret_cast<DroneShow_FencePoint*>(
-                    reinterpret_cast<uint8_t*>(geofence_setup) +
-                    sizeof(CustomPackets::simple_geofence_setup_header_t)
-                );
-                if (fence_config.num_points <= num_points) {
-                    result = configure_fences(fence_config) ? MAV_RESULT_ACCEPTED : MAV_RESULT_FAILED;
-                }
-
-                // Prepare the reply packet
-                memset(reply, 0, sizeof(reply));
-                reply[0] = CustomPackets::ACKNOWLEDGMENT;
-                ack_packet->ack_token = geofence_setup->ack_token;
-                ack_packet->result = result;
-
-                // Send the reply packet
-                mavlink_msg_data16_send(
-                    chan,
-                    CustomPackets::DRONE_TO_GCS,   // Skybrush status packet type marker
-                    sizeof(CustomPackets::acknowledgment_t),     // effective packet length
-                    reply
-                );
-
-                return true;
-            }
+            handled = _handle_geofence_setup_packet(data, length, reply);
             break;
 
         // Acknowledgment packets; these can be ignored (but we still return
         // true as we do not want any other handlers to handle them)
         case CustomPackets::ACKNOWLEDGMENT:
-            if (length >= sizeof(CustomPackets::acknowledgment_t)) {
-                return true;
-            }
+            handled = _handle_acknowledgment_packet(data, length);
             break;
-            
-        // Time axis configuration packet, used to implement suspension and resume
+
+        // Time axis configuration packet, used to implement suspension, resume and
+        // collective RTH
         case CustomPackets::TIME_AXIS_CONFIG:
-            return _handle_time_axis_configuration_packet(data, length);
+            handled = _handle_time_axis_configuration_packet(data, length);
+            break;
     }
 
-    return false;
+    if (handled && needs_reply) {
+        // Send the reply packet
+        mavlink_msg_data16_send(
+            chan,
+            CustomPackets::DRONE_TO_GCS,   // Skybrush status packet type marker
+            sizeof(CustomPackets::acknowledgment_t),     // effective packet length
+            reply
+        );
+    }
+
+    return handled;
 }
 
 bool AC_DroneShowManager::_handle_data16_message(mavlink_channel_t chan, const mavlink_message_t& msg)
@@ -316,6 +299,137 @@ bool AC_DroneShowManager::_handle_data96_message(mavlink_channel_t chan, const m
     return _handle_custom_data_message(chan, packet.data[0], packet.data + 1, packet.len - 1);
 }
 
+bool AC_DroneShowManager::_handle_acknowledgment_packet(void* data, uint8_t length)
+{
+    // Only a length check; we don't need to do anything with this packet
+    return length >= sizeof(CustomPackets::acknowledgment_t);
+}
+
+bool AC_DroneShowManager::_handle_geofence_setup_packet(void* data, uint8_t length, uint8_t* reply)
+{
+    if (length < sizeof(CustomPackets::simple_geofence_setup_header_t)) {
+        // Packet too short
+        return false;
+    }
+
+    CustomPackets::simple_geofence_setup_header_t* geofence_setup = static_cast<CustomPackets::simple_geofence_setup_header_t*>(data);
+    DroneShow_FenceConfig fence_config;
+    CustomPackets::acknowledgment_t* ack_packet = reinterpret_cast<CustomPackets::acknowledgment_t*>(reply + 1);
+    size_t points_payload_length_in_bytes = length - sizeof(CustomPackets::simple_geofence_setup_header_t);
+    size_t num_points = points_payload_length_in_bytes / sizeof(DroneShow_FencePoint);
+    MAV_RESULT result = MAV_RESULT_FAILED;
+
+    // Convert from geofence_setup to fence_config
+    fence_config.max_altitude_dm = geofence_setup->max_altitude_dm;
+    fence_config.radius_dm = geofence_setup->radius_dm;
+    fence_config.action = geofence_setup->flags & 0x0f;
+    fence_config.num_points = geofence_setup->num_points;
+    fence_config.points = reinterpret_cast<DroneShow_FencePoint*>(
+        reinterpret_cast<uint8_t*>(geofence_setup) +
+        sizeof(CustomPackets::simple_geofence_setup_header_t)
+    );
+    if (fence_config.num_points <= num_points) {
+        result = configure_fences(fence_config) ? MAV_RESULT_ACCEPTED : MAV_RESULT_FAILED;
+    }
+
+    // Prepare the reply packet
+    reply[0] = CustomPackets::ACKNOWLEDGMENT;
+    ack_packet->ack_token = geofence_setup->ack_token;
+    ack_packet->result = result;
+
+    return true;
+}
+
+bool AC_DroneShowManager::_handle_start_time_configuration_packet(void* data, uint8_t length)
+{
+    if (length < offsetof(CustomPackets::start_config_t, v2_extended_part)) {
+        // Packet too short
+        return false;
+    }
+
+    CustomPackets::start_config_t* start_config = static_cast<CustomPackets::start_config_t*>(data);
+
+    // The start time is encoded as a little-endian 32-bit signed integer, meaning the
+    // number of seconds elapsed since the start of the current GPS week in the range
+    // [0; 604799].
+    //
+    // Additional special values in start_config->start_time are:
+    //
+    // 0x7FFFFFFF (decimal 2147483647) = "do not change start time"
+    // -0x80000000 (decimal -2147483648) = "clear start time / no start time"
+    //
+    // We are liberal in what we accept so any negative value is treated as
+    // "clear start time", while any value greater than or equal to GPS_WEEK_LENGTH_SEC
+    // (604800) is treated as "do not change start time".
+    //
+    // Since May 2026 we added support for setting the start time in millisecond
+    // precision. The millisecond part is transmitted separately in the optional part
+    // of the start time configuration packet, for backward compatibility reasons.
+
+    // Update start time expressed in GPS time of week
+    if (start_config->start_time < 0) {
+        // Clear start time
+        set_scheduled_start_time_in_gps_time_of_week(-1, 0);
+    } else if (start_config->start_time >= GPS_WEEK_LENGTH_SEC) {
+        // Do not change start time
+    } else {
+        // Try to set the start time since the range is valid
+        uint16_t millisecond_offset;
+
+        // Do we have the optional v3 extensino part?
+        if (length >= sizeof(CustomPackets::start_config_t)) {
+            // Optional millisecond part is present in the packet; use it if it's valid
+            // Only the 10 least significant bits are used. Remaining bits are ignored;
+            // GCS should send them as zeros so we can use them later for other purposes
+            // if needed.
+            millisecond_offset = start_config->v3_extended_part.start_time_msec_offset & 0x3FF;
+        } else {
+            // Optional millisecond part is not present; assume zero
+            millisecond_offset = 0;
+        }
+
+        set_scheduled_start_time_in_gps_time_of_week(start_config->start_time, millisecond_offset);
+    }
+
+    // Update authorization scope
+    if (start_config->authorization == 255) {
+        // Do not change authorization
+    } else if (start_config->authorization <= DroneShowAuthorization_Last) {
+        // Update authorization scope
+        _params.authorization.set(start_config->authorization);
+    } else {
+        // Invalid value, revoke authorization for safety reasons
+        _params.authorization.set(DroneShowAuthorization_Revoked);
+    }
+
+    // Do we have the optional v2 extension part?
+    if (length >= offsetof(CustomPackets::start_config_t, v3_extended_part)) {
+        // Optional v2 part is used by the GCS to convey how many
+        // milliseconds there are until the start of the show. If this
+        // part exists and is positive, _and_ we are using the internal
+        // clock to synchronize the start, then we update the start
+        // time based on this
+        if (!uses_gps_time_for_show_start()) {
+            int32_t countdown_msec = start_config->v2_extended_part.countdown_msec;
+
+            if (countdown_msec == 0x7FFFFFFF) {
+                // Do not change start time
+            } else if (countdown_msec < -GPS_WEEK_LENGTH_MSEC) {
+                // Outside normal range; clear start time
+                clear_scheduled_start_time();
+            } else if (countdown_msec >= 0 && countdown_msec < GPS_WEEK_LENGTH_MSEC) {
+                // Start time is in the future; schedule the takeoff
+                schedule_delayed_start_after(countdown_msec);
+            } else {
+                // Start time is in the past but within the current GPS week; ignore
+                // it as the show might be running normally
+            }
+        }
+    }
+
+    return true;
+}
+
 bool AC_DroneShowManager::_handle_time_axis_configuration_packet(void* data, uint8_t length)
 {
     CustomPackets::time_axis_config_header_t* header;
@@ -352,14 +466,27 @@ bool AC_DroneShowManager::_handle_time_axis_configuration_packet(void* data, uin
         return true;
     }
     
-    if (
-        _last_time_axis_config_seq_no <= 0xFF &&
-        (header->seq_no - static_cast<uint8_t>(_last_time_axis_config_seq_no) >= 0xF0)
-    ) {
-        // Probably the packets are being sent on two or more redundant channels and
-        // we are receiving them out-of-order
-        return true;
-     }
+    if (_last_time_axis_config_seq_no <= 0xFF) {
+        // Check for packets received out-of-order. Note that we need a separate 'diff'
+        // variable, otherwise the integer promotion rules in C would make the
+        // subtraction signed.
+        uint8_t diff = header->seq_no - static_cast<uint8_t>(_last_time_axis_config_seq_no);
+        if (diff >= 0xF0) {
+            // Probably the packets are being sent on two or more redundant channels and
+            // we are receiving them out-of-order
+            return true;
+        }
+    }
+
+    // Remember the sequence number
+    _last_time_axis_config_seq_no = header->seq_no;
+
+    // Check whether we can accept this time axis configuration packet given its header
+    // and the current state of the drone show manager. If we cannot, we ignore the
+    // packet and return false.
+    if (!_is_safe_to_accept_time_axis_configuration_packet(*header)) {
+        return false;
+    }
 
     // Figure out the epoch relative to which all origin fields in the packet will be
     // interpreted
@@ -371,12 +498,14 @@ bool AC_DroneShowManager::_handle_time_axis_configuration_packet(void* data, uin
         if (epoch_msec > 0) {
             // Start time set, but we need to convert from milliseconds to seconds
             // since the start of the GPS week
-            _params.start_time_gps_sec.set(
-                ((epoch_msec - UNIX_OFFSET_MSEC) % AP_MSEC_PER_WEEK) / 1000
+            uint64_t epoch_msec_since_gps_time_origin = epoch_msec - UNIX_OFFSET_MSEC;
+            set_scheduled_start_time_in_gps_time_of_week(
+                (epoch_msec_since_gps_time_origin / 1000) % GPS_WEEK_LENGTH_SEC,
+                epoch_msec_since_gps_time_origin % 1000
             );
         } else {
             // Start time not set
-            _params.start_time_gps_sec.set(-1);
+            set_scheduled_start_time_in_gps_time_of_week(-1, 0);
         }
     } else {
         // When using the internal clock for show start, the origin is assumed to be
@@ -384,9 +513,6 @@ bool AC_DroneShowManager::_handle_time_axis_configuration_packet(void* data, uin
         // to handle it nevertheless.
         epoch_msec = 0;
     }
-    
-    // Remember the sequence number
-    _last_time_axis_config_seq_no = header->seq_no;
     
     // We need to be extra careful here; if an error happens while we are setting up the
     // new scenes, we want to leave the existing screenplay intact. Therefore, we first
@@ -439,7 +565,7 @@ bool AC_DroneShowManager::_handle_time_axis_configuration_packet(void* data, uin
             sb_rth_plan_t* rth_plan = sb_screenplay_get_rth_plan(&new_screenplay);
             sb_rth_plan_entry_t rth_plan_entry;
             float rth_start_time = static_cast<float>(scene_header->scene_id & 0x3FFF);
-            if (rth_plan == NULL || sb_rth_plan_evaluate_at(rth_plan, rth_start_time, &rth_plan_entry) != SB_SUCCESS) {
+            if (rth_plan == nullptr || sb_rth_plan_evaluate_at(rth_plan, rth_start_time, &rth_plan_entry) != SB_SUCCESS) {
                 // Could not evaluate RTH plan at the given time
                 goto exit;
             }
@@ -447,42 +573,87 @@ bool AC_DroneShowManager::_handle_time_axis_configuration_packet(void* data, uin
             // Update scene tag to mark it as a CRTH scene
             sb_screenplay_scene_set_tag(scene, SceneTag_CRTH);
 
-            // rth_plan_entry contains the start time of the RTH plan, but we don't
-            // need that -- we want to create a trajectory that starts at T=0 in
-            // show clock because the clock of the new RTH scene starts from 0
-            rth_plan_entry.time_sec = 0.0f;
-
             // Create a trajectory based on rth_plan_entry and set it to the scene
             {
                 sb_trajectory_t* rth_trajectory = sb_trajectory_new();
                 sb_trajectory_player_t player;
-                sb_vector3_with_yaw_t start_with_yaw;
                 sb_vector3_t start;
                 
                 if (rth_trajectory == nullptr) {
                     // Out of memory
                     goto exit;
                 }
-                
-                if (_show_controller.trajectory_player == nullptr) {
-                    // should not happen
-                    goto exit;
-                }
-                
-                if (sb_trajectory_player_clone(&player, _show_controller.trajectory_player) != SB_SUCCESS) {
-                    // should not happen
-                    goto exit;
-                }
-                
-                if (sb_trajectory_player_get_position_at(&player, rth_start_time, &start_with_yaw) != SB_SUCCESS) {
-                    // should not happen
+
+                if (_show_controller.trajectory_player != nullptr) {
+                    sb_vector3_with_yaw_t start_with_yaw;
+
+                    // We have started the show and the show controller has a trajectory
+                    // player so we can clone it to find out the position of the drone
+                    // at the start of the RTH plan, then construct a trajectory from
+                    // there according to the plan.
+                    if (sb_trajectory_player_clone(&player, _show_controller.trajectory_player) != SB_SUCCESS) {
+                        // should not happen
+                        goto exit;
+                    }
+                    
+                    if (sb_trajectory_player_get_position_at(&player, rth_start_time, &start_with_yaw) != SB_SUCCESS) {
+                        // should not happen
+                        sb_trajectory_player_destroy(&player);
+                        goto exit;
+                    }
+                    
+                    start.x = start_with_yaw.x;
+                    start.y = start_with_yaw.y;
+                    start.z = start_with_yaw.z;
+
                     sb_trajectory_player_destroy(&player);
-                    goto exit;
+                } else {
+                    // No trajectory player yet. This may happen if the CRTH command
+                    // arrives during the "Waiting for start time" or "Takeoff" phases.
+                    // In that case we just need to create a landing trajectory.
+                    if (_stage_in_drone_show_mode == DroneShow_WaitForStartTime ||
+                        _stage_in_drone_show_mode == DroneShow_Takeoff) {
+                        start.x = _takeoff_position_mm.x;
+                        start.y = _takeoff_position_mm.y;
+                        start.z = _takeoff_position_mm.z;
+
+                        sb_rth_plan_entry_clear(&rth_plan_entry, rth_plan, 0.0f);
+                    } else {
+                        // We are in an unexpected stage; we cannot create a valid RTH
+                        // trajectory
+                        goto exit;
+                    }
                 }
-                
-                start.x = start_with_yaw.x;
-                start.y = start_with_yaw.y;
-                start.z = start_with_yaw.z;
+
+                // rth_plan_entry contains the start time of the RTH plan, but we don't
+                // need that -- we want to create a trajectory that starts at T=0 in
+                // show clock because the clock of the new RTH scene starts from 0
+                rth_plan_entry.time_sec = 0.0f;
+    
+                // If the drone is configured to adjust for takeoff placement errors
+                // AND it is flying back to its takeoff position during CRTH, we need
+                // to adjust the indicated end coordinates of the RTH plan
+                // to account for the takeoff placement error.
+                if (
+                    _trajectory_is_circular &&
+                    _trajectory_modified_for_landing &&
+                    (rth_plan_entry.flags & SB_RTH_PLAN_ENTRY_HAS_TARGET_XY)
+                ) {
+                    float dist_mm = hypotf(
+                        rth_plan_entry.landing_target.x - _trajectory_stats.initial_pos.x,
+                        rth_plan_entry.landing_target.y - _trajectory_stats.initial_pos.y
+                    );
+                    if (dist_mm / 1000.0f /* [mm] --> [m] */ < DEFAULT_START_END_XY_DISTANCE_THRESHOLD_METERS) {
+                        // The landing target is very close to the initial position of the
+                        // trajectory, so we assume that the RTH plan is meant to land at
+                        // the takeoff position. We know the X and Y coordinates of the
+                        // takeoff position from _trajectory_stats, which has been adjusted
+                        // at takeoff time
+                        rth_plan_entry.landing_target.x = _trajectory_stats.pos_at_landing_time.x;
+                        rth_plan_entry.landing_target.y = _trajectory_stats.pos_at_landing_time.y;
+                    }
+                }
+
                 if (sb_trajectory_update_from_rth_plan_entry(rth_trajectory, &rth_plan_entry, start) != SB_SUCCESS) {
                     // Could not create RTH plan trajectory
                     sb_trajectory_player_destroy(&player);
@@ -492,8 +663,6 @@ bool AC_DroneShowManager::_handle_time_axis_configuration_packet(void* data, uin
 
                 sb_screenplay_scene_set_trajectory(scene, rth_trajectory);
                 SB_DECREF(rth_trajectory);
-
-                sb_trajectory_player_destroy(&player);
                 
                 // Log the details of the CRTH trigger for debugging purposes
                 write_crth_trigger_log_message(rth_start_time, start);
@@ -543,6 +712,11 @@ bool AC_DroneShowManager::_handle_time_axis_configuration_packet(void* data, uin
             ptr += sizeof(CustomPackets::time_axis_config_scene_entry_t);
     
             if (entry->duration_msec == 0) {
+                // This is a special segment that indicates that the duration of the
+                // scene is dynamic and depends on the trajectory. We need to set a
+                // flag on the scene to indicate this, and calculate the actual duration
+                // of the segment based on the trajectory itself.
+                sb_screenplay_scene_set_flag(scene, SB_SCREENPLAY_SCENE_FLAG_DYNAMIC_DURATION);
                 if (!_ensure_scene_covers_relevant_part_of_trajectory(
                     scene, entry->initial_rate_scaled / 65535.0f,
                     entry->final_rate_scaled / 65535.0f
@@ -590,4 +764,36 @@ exit:
     }
     
     return success;
+}
+
+bool AC_DroneShowManager::_is_safe_to_accept_time_axis_configuration_packet(
+    const CustomPackets::time_axis_config_header_t& header) const
+{
+    if (!uses_gps_time_for_show_start()) {
+        // When using the internal clock for show start, we can accept any time axis
+        // configuration packet at any time
+        return true;
+    }
+
+    // Slight adjustments to the start time is okay; this can happen if the time code
+    // is slipping a bit and the GCS is trying to correct it. Note that the
+    // timestamps are unsigned so we need to compute the difference in a signed
+    // type, otherwise moving the start time earlier would wrap around.
+    const int64_t start_time_diff_msec =
+        static_cast<int64_t>(header.start_time_msec) -
+        static_cast<int64_t>(_start_time_unix_usec / 1000);
+    bool would_change_start_time_significantly = (
+        start_time_diff_msec >= 100 || start_time_diff_msec <= -100
+    );
+    if (
+        would_change_start_time_significantly &&
+        !_is_safe_to_change_start_time_in_current_stage()
+    ) {
+        // We are not allowed to change the start time in the current stage of the
+        // drone show mode, so we cannot accept a time axis configuration packet
+        // that would change the start time
+        return false;
+    }
+
+    return true;
 }

@@ -4,6 +4,7 @@
 #include <AP_Filesystem/AP_Filesystem.h>
 #include <AP_GPS/AP_GPS.h>
 #include <AP_HAL/AP_HAL.h>
+#include <AP_InertialSensor/AP_InertialSensor.h>
 #include <AP_Logger/AP_Logger.h>
 #include <AP_Math/AP_Math.h>
 #include <AP_Motors/AP_Motors.h>
@@ -36,18 +37,20 @@ AC_DroneShowManager::AC_DroneShowManager() :
 #endif
     _init_ok(false),
     _show_data(0),
-    _stage_in_drone_show_mode(DroneShow_Off),
+    _projected_wall_clock_time_at_takeoff_sec(NAN),
+    _vibration(),
     _start_time_requested_by(StartTimeSource::NONE),
     _start_time_on_internal_clock_usec(0),
     _start_time_unix_usec(0),
+    _stage_in_drone_show_mode(DroneShow_Off),
     _trajectory_is_circular(false),
     _controller_update_delta_msec(1000 / DEFAULT_UPDATE_RATE_HZ),
     _pyro_device(0),
     _rgb_led(0),
+    _rgb_led_input(),
+    _last_time_axis_config_seq_no(0xFFFF),    // 0xFFFF is never a valid sequence number
     _rc_switches_blocked_until(0),
-    _boot_count(0),
-    _projected_wall_clock_time_at_takeoff_sec(NAN),
-    _last_time_axis_config_seq_no(0xFFFF)    // 0xFFFF is never a valid sequence number
+    _boot_count(0)
 {
     bool ok = true;
 
@@ -57,6 +60,8 @@ AC_DroneShowManager::AC_DroneShowManager() :
     ok &= (sb_screenplay_init(&_screenplay) == SB_SUCCESS);
     ok &= (sb_screenplay_scene_init(&_main_show_scene) == SB_SUCCESS);
     ok &= (sb_show_controller_init(&_show_controller, &_screenplay) == SB_SUCCESS);
+    ok &= (sb_show_metadata_init(&_show_metadata) == SB_SUCCESS);
+    _clear_show_config_hash();
     
     _init_ok = ok;
 
@@ -66,6 +71,7 @@ AC_DroneShowManager::AC_DroneShowManager() :
 
 AC_DroneShowManager::~AC_DroneShowManager()
 {
+    sb_show_metadata_destroy(&_show_metadata);
     sb_show_controller_destroy(&_show_controller);
     SB_DECREF_STATIC(&_main_show_scene);
     sb_screenplay_destroy(&_screenplay);
@@ -84,6 +90,9 @@ void AC_DroneShowManager::init(const AC_WPNav* wp_nav)
     AP_Int16* boot_count_param = static_cast<AP_Int16*>(AP_Param::find("STAT_BOOTCNT", &ptype));
     _boot_count = boot_count_param ? (*boot_count_param) : 0;
 
+    // Get references to any additional parameters that we need frequently
+    _find_fence_params();
+
     // Get references to the RGB LED and pyro device factories
     _pyro_device_factory = &_pyro_device_factory_singleton;
     _rgb_led_factory = &_rgb_led_factory_singleton;
@@ -95,9 +104,12 @@ void AC_DroneShowManager::init(const AC_WPNav* wp_nav)
     // subsystem has already loaded back the previous value from the EEPROM so
     // we are safe to overwrite it
     _params.start_time_gps_sec.set(-1);
+    _params.start_time_gps_msec_offset.set(0);
     _params.authorization.set(DroneShowAuthorization_Revoked);
 
     _load_show_file_from_storage();
+    _update_show_metadata_params();
+    _update_show_config_hash();
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
     _open_rgb_led_socket();
 #endif
@@ -119,6 +131,7 @@ bool AC_DroneShowManager::clear_scheduled_start_time(bool force)
     }
 
     _params.start_time_gps_sec.set(-1);
+    _params.start_time_gps_msec_offset.set(0);
     _start_time_on_internal_clock_usec = 0;
     _start_time_requested_by = StartTimeSource::NONE;
     _start_time_unix_usec = 0;
@@ -442,6 +455,26 @@ void AC_DroneShowManager::notify_drone_show_mode_entered_stage(DroneShowModeStag
     if (stage == DroneShow_Takeoff) {
         write_screenplay_log_messages();
     }
+
+    // If we have just entered the "waiting for start time" phase, set the RGB LED
+    // source to "show" or "pixel grid" depending on the appropriate SHOW_OPTIONS bit
+    if (stage == DroneShow_WaitForStartTime) {
+        _rgb_led_input.set_type(
+            _has_option(DroneShowOption_PixelGridTestOnGround)
+                ? LightInputSource_PixelGrid
+                : LightInputSource_Show
+        );
+    }
+
+    // If we have just started performing the show, _or_ if we have just landed, make
+    // sure to show the light program that is set in the show file
+    if (
+        stage == DroneShow_Performing ||
+        stage == DroneShow_TestingLights ||
+        stage == DroneShow_Landed
+    ) {
+        _rgb_led_input.set_type(LightInputSource_Show);
+    }
 }
 
 void AC_DroneShowManager::notify_drone_show_mode_exited()
@@ -486,12 +519,11 @@ bool AC_DroneShowManager::schedule_delayed_start_after(uint32_t delay_ms)
 
     if (uses_gps_time_for_show_start()) {
         if (_is_gps_time_ok()) {
-            // We are modifying a parameter directly here without notifying the
-            // param subsystem, but this is okay -- we do not want to save the
-            // start time into the EEPROM, and it is reset at the next boot anyway.
-            // Delay is rounded down to integer seconds.
-            _params.start_time_gps_sec.set(((AP::gps().time_week_ms() + delay_ms) / 1000) % GPS_WEEK_LENGTH_SEC);
-            success = true;
+            uint32_t desired_start_time = AP::gps().time_week_ms() + delay_ms;
+            success = set_scheduled_start_time_in_gps_time_of_week(
+                (desired_start_time / 1000) % GPS_WEEK_LENGTH_SEC,
+                desired_start_time % 1000
+            );
         }
     } else {
         _start_time_on_internal_clock_usec = AP_HAL::micros64() + (delay_ms * 1000);
@@ -505,15 +537,37 @@ bool AC_DroneShowManager::schedule_delayed_start_after(uint32_t delay_ms)
     return success;
 }
 
+bool AC_DroneShowManager::set_scheduled_start_time_in_gps_time_of_week(
+    int32_t gps_sec, int16_t gps_msec_offset
+) {
+    bool success = true;
+
+    if (gps_sec < 0) {
+        _params.start_time_gps_sec.set(-1);
+    } else if (gps_sec < GPS_WEEK_LENGTH_SEC) {
+        _params.start_time_gps_sec.set(gps_sec);
+    } else {
+        success = false;
+    }
+
+    if (success) {
+        _params.start_time_gps_msec_offset.set(gps_msec_offset);
+    }
+
+    return success;
+}
+
 void AC_DroneShowManager::update()
 {
     static bool main_cycle = true;
 
     if (main_cycle) {
         _check_changes_in_parameters();
+        _check_changes_in_geofence();
         _check_events();
         _check_radio_failsafe();
         _update_preflight_check_result();
+        _update_vibration_warning();
         _trigger_show_events();
         _update_lights();
         _update_pyro_device();
@@ -569,8 +623,11 @@ bool AC_DroneShowManager::_ensure_scene_covers_relevant_part_of_trajectory(
 )
 {
     float duration_sec;
+    float landing_time_sec;
+    float trajectory_duration_sec;
     sb_time_axis_t* time_axis;
     sb_time_segment_t segment;
+    sb_trajectory_t* trajectory;
 
     time_axis = scene ? sb_screenplay_scene_get_time_axis(scene) : nullptr;
     if (!time_axis) {
@@ -591,6 +648,28 @@ bool AC_DroneShowManager::_ensure_scene_covers_relevant_part_of_trajectory(
                 _trajectory_stats.landing_time_sec <= _trajectory_stats.duration_sec
             ) {
                 duration_sec -= _trajectory_stats.duration_sec - _trajectory_stats.landing_time_sec;
+            }
+            break;
+
+        case SceneTag_CRTH:
+            // The RTH trajectory descends all the way to the ground at the
+            // landing speed of the RTH plan. Like at the end of the main show,
+            // the scene ends where the final descent reaches the takeoff
+            // altitude, and the landing at the end of the show takes over from
+            // there at the landing speed of ArduCopter.
+            trajectory = sb_screenplay_scene_get_trajectory(scene);
+            if (trajectory != nullptr) {
+                trajectory_duration_sec = sb_trajectory_get_total_duration_sec(trajectory);
+                landing_time_sec = sb_trajectory_propose_landing_time_sec(
+                    trajectory, get_takeoff_altitude_mm(), 50.0f /* [mm] */
+                );
+                if (
+                    isfinite(landing_time_sec) &&
+                    landing_time_sec >= 0 &&
+                    landing_time_sec <= trajectory_duration_sec
+                ) {
+                    duration_sec -= trajectory_duration_sec - landing_time_sec;
+                }
             }
             break;
 
@@ -652,6 +731,57 @@ bool AC_DroneShowManager::_is_close_to_position(
     }
 
     return true;
+}
+
+void AC_DroneShowManager::_update_vibration_warning()
+{
+    const float threshold = _params.vibration_warning_threshold;
+
+    if (threshold <= 0) {
+        _vibration.warning = false;
+        _vibration.threshold_crossed_at_msec = 0;
+        return;
+    }
+
+    // The vibration levels from the IMU are already low-pass filtered, so we
+    // simply take the largest one across all axes and all usable accelerometers.
+    // Averaging the axes would hide a problem that shows up on a single axis.
+    const AP_InertialSensor &ins = AP::ins();
+    const uint8_t num_accels = MIN(ins.get_accel_count(), INS_VIBRATION_CHECK_INSTANCES);
+    float level = 0;
+
+    for (uint8_t i = 0; i < num_accels; i++) {
+        if (ins.use_accel(i)) {
+            const Vector3f vibe = ins.get_vibration_levels(i);
+            level = MAX(level, MAX(vibe.x, MAX(vibe.y, vibe.z)));
+        }
+    }
+
+    // The warning is raised above the threshold and cleared below a lower
+    // threshold. Both transitions happen only if the level stays on the other
+    // side of the threshold long enough. This prevents the flag from flapping
+    // when the level hovers around the threshold.
+    const bool crossed = _vibration.warning
+        ? level < threshold * VIBRATION_WARNING_CLEAR_RATIO
+        : level > threshold;
+
+    if (!crossed) {
+        _vibration.threshold_crossed_at_msec = 0;
+        return;
+    }
+
+    const uint32_t now = AP_HAL::millis();
+    if (_vibration.threshold_crossed_at_msec == 0) {
+        _vibration.threshold_crossed_at_msec = now;
+    }
+
+    const uint32_t delay_ms = _vibration.warning
+        ? VIBRATION_WARNING_CLEAR_DELAY_MSEC
+        : VIBRATION_WARNING_RAISE_DELAY_MSEC;
+    if (now - _vibration.threshold_crossed_at_msec >= delay_ms) {
+        _vibration.warning = !_vibration.warning;
+        _vibration.threshold_crossed_at_msec = 0;
+    }
 }
 
 void AC_DroneShowManager::_update_preflight_check_result(bool force)

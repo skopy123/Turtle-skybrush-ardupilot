@@ -9,11 +9,17 @@
 
 #define NO_MORE_MESSAGES { MSG_LAST, 0 }
 
+// Resolution of the wind speed in the extended status packet, in m/s
+#define WIND_SPEED_RESOLUTION 0.2f
+
 static const AC_DroneShowManager::TelemetryRequest default_telemetry_stream[] = {
     { MSG_DRONE_SHOW_STATUS, 500 },  // drone show status as DATA16, 2 Hz
     { MSG_LOCATION, 500 },           // GLOBAL_POSITION_INT, 2 Hz
     { MSG_SYS_STATUS, 1000 },        // SYS_STATUS, 1 Hz
     { MSG_GPS_RAW, 1000 },           // GPS_RAW_INT, 1 Hz
+    // The extended drone show status carries fields that are missing from
+    // the DATA16 status packet, but they change rarely.
+    { MSG_EXTENDED_DRONE_SHOW_STATUS, 5000 },  // extended drone show status as DATA96, 0.2 Hz
     NO_MORE_MESSAGES
 };
 
@@ -22,6 +28,8 @@ static const AC_DroneShowManager::TelemetryRequest compact_telemetry_stream[] = 
     { MSG_SYS_STATUS, 1000 },                  // SYS_STATUS, 1 Hz
     NO_MORE_MESSAGES
 };
+
+static int32_t encode_gps_start_time(int32_t gps_sec, int32_t gps_msec_offset);
 
 const AC_DroneShowManager::TelemetryRequest* AC_DroneShowManager::get_preferred_telemetry_messages() const
 {
@@ -93,10 +101,22 @@ void AC_DroneShowManager::send_extended_drone_show_status(const mavlink_channel_
     status->gps_hdop = gps.get_hdop(0);
     status->gps_vdop = gps.get_vdop(0);
 
-    /* show metadata: show ID and index of trajectory within show (if known) */
-    /* TODO(ntamas) */
-    status->show_id = 0;
-    status->trajectory_index = 0xFFFF; // not known
+    /* show metadata: show ID and index of the drone within the show */
+    get_show_id(status->show_id);
+    status->trajectory_index = get_drone_index_in_show();
+
+    /* hash of the show configuration */
+    status->config_hash = get_show_config_hash();
+
+    /* wind estimate; the speed stays zero ("not known") if there is no
+     * estimate because the packet was zeroed above */
+    Vector3f wind;
+    if (ahrs.wind_estimate(wind)) {
+        const float speed = wind.xy().length();
+        const float direction_deg = wrap_360(degrees(atan2f(-wind.y, -wind.x)));
+        status->wind_speed = MIN(1 + lroundf(speed / WIND_SPEED_RESOLUTION), 255);
+        status->wind_direction = static_cast<uint8_t>(lroundf(direction_deg * 256.0f / 360.0f) & 0xFF);
+    }
 
     /* send the packet */
     mavlink_msg_data96_send(
@@ -168,12 +188,16 @@ uint8_t* AC_DroneShowManager::_fill_drone_show_status_packet_buffer(uint8_t* buf
      *
      * Bits 0 and 1: boot count modulo 4
      * Bits 2 and 3: authorization scope
-     * Bits 4-5: reserved, set to zero
+     * Bit 4: reserved, set to zero
+     * Bit 5: indicates that the vibration levels of the drone are too high.
      * Bit 6: indicates that at least one ESC is reporting a high error rate.
      * Bit 7: indicates that the drone has deviated from its expected position.
      */
     flags3 = _boot_count & 0x03;
     flags3 |= (static_cast<uint8_t>(get_authorization_scope()) & 0x03) << 2;
+    if (_vibration.warning) {
+        flags3 |= (1 << 5);
+    }
     if (
         _params.max_esc_error_rate_pcnt >= 0 &&
         AP::esc_telem().has_high_error_rate(_params.max_esc_error_rate_pcnt)
@@ -210,8 +234,8 @@ uint8_t* AC_DroneShowManager::_fill_drone_show_status_packet_buffer(uint8_t* buf
      * start time according to GPS timestamps, even if we are using the
      * internal clock to synchronize the start. This is to make sure that the
      * UI on Skybrush Live shows the GPS timestamp set by the user */
-    status->start_time = _params.start_time_gps_sec;
-    status->led_color = sb_rgb_color_encode_rgb565(_last_rgb_led_color);
+    status->start_time = encode_gps_start_time(_params.start_time_gps_sec, _params.start_time_gps_msec_offset);
+    status->led_color = sb_rgb_color_encode_rgb565(_rgb_led_last_color);
     status->flags = flags;
     status->flags2 = flags2;
     status->flags3 = flags3;
@@ -237,4 +261,16 @@ uint8_t* AC_DroneShowManager::_fill_drone_show_status_packet_buffer(uint8_t* buf
     }
 
     return buf + sizeof(CustomPackets::drone_show_status_t);
+}
+
+static int32_t encode_gps_start_time(int32_t gps_sec, int32_t gps_msec_offset)
+{
+    if (gps_sec < 0) {
+        return -1;
+    }
+
+    // gps_sec is between 0 and GPS_WEEK_LENGTH_SEC so 20 bits are enough. We store
+    // the millisecond offset shifted right by 20 bits, and we mask the remaining
+    // two bits.
+    return (gps_sec & 0xFFFFF) | ((gps_msec_offset & 0x3FF) << 20);
 }

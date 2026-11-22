@@ -3,6 +3,8 @@
 #include <AP_Logger/AP_Logger.h>
 #include <GCS_MAVLink/GCS.h>
 
+static const AP_Int8* find_int8_param(const char* name);
+
 bool AC_DroneShowManager::configure_fences(DroneShow_FenceConfig& config)
 {
     uint8_t fence_enabled_mask = 0;
@@ -119,8 +121,30 @@ bool AC_DroneShowManager::configure_fences(DroneShow_FenceConfig& config)
             return false;
     }
 
-    // Enable the fences
+    // FENCE_TYPE selects the fence types, and FENCE_ENABLE switches all of
+    // them on or off. AC_Fence applies FENCE_TYPE only when FENCE_ENABLE
+    // changes. We also update the set of active fences directly to cover the
+    // case when FENCE_ENABLE stays the same. Fences that are not needed any
+    // more are disabled first because AC_Fence ignores the fence types that
+    // are missing from FENCE_TYPE.
+    AC_Fence* fence = AP::fence();
+    if (fence) {
+        fence->enable(false, ~fence_enabled_mask, false);
+    }
+
     value = fence_enabled_mask;
+    if (!AP_Param::set_and_save_by_name("FENCE_TYPE", value)) {
+        gcs().send_text(MAV_SEVERITY_ERROR, "FENCE_TYPE parameter cannot be set");
+        return false;
+    }
+
+#if HAL_LOGGING_ENABLED
+    if (logger != nullptr) {
+        logger->Write_Parameter("FENCE_TYPE", static_cast<float>(value));
+    }
+#endif
+
+    value = fence_enabled_mask ? 1 : 0;
     if (!AP_Param::set_and_save_by_name("FENCE_ENABLE", value)) {
         gcs().send_text(MAV_SEVERITY_ERROR, "FENCE_ENABLE parameter cannot be set");
         return false;
@@ -132,5 +156,53 @@ bool AC_DroneShowManager::configure_fences(DroneShow_FenceConfig& config)
     }
 #endif
 
+    if (fence && fence_enabled_mask) {
+        fence->enable(true, fence_enabled_mask, false);
+    }
+
+    // Recalculate the hash here instead of waiting for the fence to be
+    // reloaded. The reload happens only when the EKF has an origin.
+    _update_show_config_hash();
+
     return true;
+}
+
+void AC_DroneShowManager::_check_changes_in_geofence()
+{
+    const AC_Fence* fence = AP::fence();
+
+    const uint32_t fence_loaded_at_msec = fence ? fence->polyfence().get_inclusion_polygon_update_ms() : 0;
+
+    if (
+        fence_loaded_at_msec != _show_config_hash.fence_loaded_at_msec ||
+        _is_polygon_fence_enabled() != _show_config_hash.polygon_fence_enabled
+    ) {
+        _update_show_config_hash();
+    }
+}
+
+void AC_DroneShowManager::_find_fence_params()
+{
+    _fence_params.enable = find_int8_param("FENCE_ENABLE");
+    _fence_params.type = find_int8_param("FENCE_TYPE");
+}
+
+bool AC_DroneShowManager::_is_polygon_fence_enabled() const
+{
+    // FENCE_ENABLE switches all fences on or off, and FENCE_TYPE selects the
+    // fence types that are active when the fences are on
+    return (
+        _fence_params.enable && _fence_params.type &&
+        _fence_params.enable->get() != 0 &&
+        (_fence_params.type->get() & AC_FENCE_TYPE_POLYGON)
+    );
+}
+
+// Looks up an 8-bit integer parameter by its name; returns null if there is
+// no such parameter or it has a different type
+static const AP_Int8* find_int8_param(const char* name)
+{
+    enum ap_var_type ptype;
+    const AP_Param* param = AP_Param::find(name, &ptype);
+    return (param && ptype == AP_PARAM_INT8) ? static_cast<const AP_Int8*>(param) : nullptr;
 }

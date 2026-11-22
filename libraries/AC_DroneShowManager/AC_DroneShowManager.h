@@ -18,9 +18,9 @@
 
 #include <skybrush/skybrush.h>
 
+#include "DroneShow_CustomPackets.h"
 #include "DroneShow_Enums.h"
 #include "DroneShow_FenceConfig.h"
-#include "skybrush/screenplay.h"
 
 class DroneShowLEDFactory;
 class DroneShowLED;
@@ -75,6 +75,25 @@ private:
         bool is_valid() const { return origin_lat != 0 && origin_lng != 0; };
     };
 
+    class LightInputSource {
+    public:
+        LightInputSource();
+        void clear();
+        bool configure_from_event_payload(const uint8_t* payload, size_t size) WARN_IF_UNUSED;
+        LightInputSourceType type() const { return _type; }
+        sb_rgb_color_t fixed_color() const { return _fixed_color; }
+        void set_type(LightInputSourceType type) { _type = type; }
+        void set_fixed_color(sb_rgb_color_t color) { _fixed_color = color; }
+
+    private:
+        // Type of the light input source
+        LightInputSourceType _type;
+
+        // Color to use when the light input source is set to fixed color. This is
+        // ignored when the light input source is set to any other type.
+        sb_rgb_color_t _fixed_color;
+    };
+
     class PyroTestState {
     public:
         PyroTestState() {
@@ -97,6 +116,70 @@ private:
 
         // Time between consecutive channel tests, in milliseconds
         uint32_t delta_msec;
+    };
+
+    class PixelGridState {
+    public:
+        PixelGridState();
+        ~PixelGridState();
+
+        // Reset the pixel grid state to its default values. The row and column are set
+        // to 0, and the color is set to black. The palette is dropped.
+        void reset();
+
+        // Sets the row index in the pixel grid that the drone represents.
+        // The row is 0-indexed. Returns whether the row index is valid (i.e. less than
+        // 4096) and was set successfully.
+        bool set_row(uint32_t new_row) WARN_IF_UNUSED;
+
+        // Sets the column index in the pixel grid that the drone represents.
+        // The column is 0-indexed. Returns whether the column index is valid (i.e. less
+        // than 4096) and was set successfully.
+        bool set_column(uint32_t new_column) WARN_IF_UNUSED;
+
+        // Sets the row and column in the pixel grid that the drone represents.
+        // The row and column are 0-indexed.
+        bool set_position(uint32_t row, uint32_t column) WARN_IF_UNUSED;
+
+        // Sets the color of the pixel that the drone represents in the pixel grid.
+        void set_color(sb_rgb_color_t new_color) { color = new_color; }
+
+        // Sets the color of the pixel based on a single bit of information as follows:
+        // - When the palette has 2 or more entries, use entry 0 for false and entry 1
+        //   for true.
+        // - When the palette has 1 entry, use black for false and entry 0 for true.
+        // - When the palette has no entries, use black for false and white for true.
+        void set_color_by_bit(bool bit);
+
+        // Sets the color of the pixel by its index in the palette of the pixel grid.
+        void set_color_by_palette_index(uint8_t palette_index);
+
+        // Returns the row and column in the pixel grid that the drone
+        // represents. The row and column are 0-indexed and they fit in 12 bits, hence
+        // the data type.
+        void get_position(uint16_t& row_out, uint16_t& column_out) const;
+
+        // Updates the pixel grid state from a GCS light control setup object
+        bool update_from_gcs_light_control_block(const sb_gcs_light_control_setup_t& spec) WARN_IF_UNUSED;
+
+        // Updates the pixel grid state from a binary show file stored in memory
+        bool update_from_binary_file_in_memory(uint8_t* show_data, size_t length) WARN_IF_UNUSED;
+
+    public:
+        // Color to show on the drone when the drone is in pixel grid mode
+        sb_rgb_color_t color;
+
+    private:
+        // Row index of the pixel that the drone represents in the pixel grid.
+        uint16_t _row;
+
+        // Column index of the pixel that the drone represents in the pixel grid.
+        uint16_t _column;
+
+        // Pointer to the palette of the pixel grid. The palette is stored in the show
+        // file and it is used to determine the color of the pixel represented by the
+        // drone in palette-based mode.
+        sb_color_palette_t _palette;
     };
 
 public:
@@ -180,10 +263,6 @@ public:
     // program.
     sb_rgb_color_t get_desired_color_of_rgb_light();
 
-    // Returns the color of the LED light on the drone according to its light
-    // program the given number of seconds after the start time.
-    sb_rgb_color_t get_desired_color_of_rgb_light_at_seconds(float time);
-
     // Returns the preferred duration between consecutive guided mode commands
     // during the execution of the show.
     uint32_t get_controller_update_delta_msec() const { return _controller_update_delta_msec; }
@@ -228,7 +307,12 @@ public:
     // takeoff point and the current position of the drone to decide whether to
     // RTL or land if the post-show action is set to "RTL or land", otherwise
     // it returns the action set in the SHOW_POST_ACTION parameter. Note that
-    // the function is guaranteed never to return PostAction_RTLOrLand
+    // the function is guaranteed never to return PostAction_RTLOrLand.
+    //
+    // The function always returns PostAction_Land, irrespectively of
+    // SHOW_POST_ACTION, if a collective RTH was triggered (the RTH plan has
+    // already taken the drone to its landing position) or if the drone is
+    // close to the ground (any other action would make it take off again)
     PostAction get_action_at_end_of_show() const;
 
     // Returns the action to be performed by the bubble fence module
@@ -240,7 +324,7 @@ public:
     bool get_global_takeoff_position(Location& loc) const;
     
     // Returns the last color that was emitted to the RGB light
-    void get_last_rgb_led_color(sb_rgb_color_t& color) const { color = _last_rgb_led_color; }
+    void get_last_rgb_led_color(sb_rgb_color_t& color) const { color = _rgb_led_last_color; }
 
     // Returns the preferred set of telemetry messages at boot time.
     // The result will be a pointer to a statically allocated array of pairs of
@@ -298,6 +382,9 @@ public:
 
     // Returns the altitude to take off to above the current position of the drone, in centimeters
     int32_t get_takeoff_altitude_cm() const { return _params.takeoff_altitude_m * 100.0f; }
+
+    // Returns the altitude to take off to above the current position of the drone, in millimeters
+    int32_t get_takeoff_altitude_mm() const { return _params.takeoff_altitude_m * 1000.0f; }
 
     // Returns the takeoff speed in meters per second
     float get_takeoff_speed_m_sec() const;
@@ -433,6 +520,20 @@ public:
     // Returns whether a show file was identified and loaded at boot time
     bool loaded_show_data_successfully() const;
 
+    // Copies the unique ID of the loaded show into the given buffer, which
+    // must be at least SB_SHOW_METADATA_SHOW_ID_LENGTH bytes long. The ID is
+    // all zeros if the show file does not specify it.
+    void get_show_id(uint8_t* show_id) const;
+
+    // Returns the index of the drone within the loaded show according to the
+    // metadata block of the show file; zero if the show file does not specify it.
+    uint16_t get_drone_index_in_show() const;
+
+    // Returns the hash of the show configuration: the show ID, the origin and
+    // the orientation of the show, and the stored geofence. Drones with the
+    // same show configuration have the same hash. Zero if not known.
+    uint32_t get_show_config_hash() const { return _show_config_hash.value; }
+
     // Returns whether the drone matches the given group mask
     bool matches_group_mask(uint8_t mask) const {
         return mask == 0 || mask & (1 << _params.group_index);
@@ -456,6 +557,11 @@ public:
     // Notifies the drone show manager that the takeoff is about to take place.
     // The drone show manager may decide to cancel the takeoff by returning false.
     bool notify_takeoff_attempt() WARN_IF_UNUSED;
+
+    // Notifies the drone show manager that a takeoff has started.
+    // The drone show manager may act on it but is not allowed to cancel the takeoff at
+    // this point.
+    void notify_takeoff_started();
 
     // Handler for the MAVLink CMD_USER1 message that allows the user to reload _or_ clear the show
     bool reload_or_clear_show(bool do_clear) WARN_IF_UNUSED;
@@ -483,6 +589,23 @@ public:
     // This function is a no-op if the drone show is not in the "waiting for
     // start time" phase.
     bool schedule_delayed_start_after(uint32_t delay_ms);
+
+    // Sets the scheduled start time of the show according to GPS time, in seconds and
+    // milliseconds. This function does _not_ set the synchronization mode to GPS time
+    // if it is set to something else; it is only responsible for updating the two
+    // parameters storing the start time in tandem.
+    //
+    // Negative values in gps_sec will clear the scheduled GPS-based start time.
+    // gps_sec values larger than the number of seconds in a GPS week are considered
+    // invalid and will be rejected. Millisecond offsets are accepted and updated if
+    // and only if the gps_sec value is valid.
+    //
+    // Note that the function will update the parameters even if the show is not in the
+    // "waiting for start time" phase. However, the changes will not update the _actual_
+    // internal variables that we use to start the show.
+    //
+    // Returns whether the parameters were updated successfully.
+    bool set_scheduled_start_time_in_gps_time_of_week(int32_t gps_sec, int16_t gps_msec_offset);
 
     // Sends a drone show status message (wrapped in a DATA16 packet) on the given MAVLink channel.
     // This is used by the legacy telemetry configuration where information from this packet must
@@ -560,8 +683,14 @@ private:
     // Structure holding all the parameters settable by the user
     struct {
         // Start time in GPS time of week (seconds), as set by the user in a parameter.
-        // Used only when time_sync_mode == TimeSyncMode_GPS
+        // Used only when time_sync_mode == TimeSyncMode_GPS. Must be considered
+        // together with start_time_gps_msec_offset to allow for millisecond-level
+        // precision.
         AP_Int32 start_time_gps_sec;
+
+        // Extra millisecond offset to add to the start time in GPS time, as set by the
+        // user in a parameter. This allows for millisecond-level precision.
+        AP_Int16 start_time_gps_msec_offset;
 
         // Latitude of drone show coordinate system, in 1e-7 degrees, as set in the parameters by the user
         AP_Int32 origin_lat;
@@ -657,6 +786,26 @@ private:
 
         // Maximum allowed ESC error rate percentage, -1 when disabled
         AP_Int8 max_esc_error_rate_pcnt;
+
+        // Vibration level above which the drone reports a vibration warning,
+        // in m/s/s. Zero or negative values disable the check.
+        AP_Float vibration_warning_threshold;
+
+        // Index of the drone within the loaded show, from the metadata block
+        // of the show file. Read-only; set when the show is loaded.
+        AP_Int32 drone_index_in_show;
+
+        // Upper and lower 16 bits of the ID of the loaded show, from the
+        // metadata block of the show file. Read-only; set when the show is
+        // loaded. A single 32-bit parameter would lose precision because
+        // MAVLink transfers parameter values as floats.
+        AP_Int32 show_id_hi;
+        AP_Int32 show_id_lo;
+
+        // Upper and lower 16 bits of the hash of the show configuration; see
+        // get_show_config_hash(). Read-only; set when the hash changes.
+        AP_Int32 config_hash_hi;
+        AP_Int32 config_hash_lo;
     } _params;
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
@@ -674,6 +823,25 @@ private:
     // Memory area holding the entire show file loaded from the storage
     uint8_t* _show_data;
     
+    // Metadata of the loaded show: the show ID and the index of the drone
+    // within the show. Fields that the show file does not specify are zero.
+    sb_show_metadata_t _show_metadata;
+
+    // Structure storing the hash of the show configuration. Updated from
+    // _update_show_config_hash().
+    struct {
+        uint32_t value;                  //< The hash itself; see get_show_config_hash()
+        uint32_t fence_loaded_at_msec;   //< Load time of the polygon fence when the hash was calculated
+        bool polygon_fence_enabled;      //< Whether the polygon fence was enabled when the hash was calculated
+    } _show_config_hash;
+
+    // Pointers to the parameters of the fence library that decide whether the
+    // polygon fence is enabled. Looked up in init().
+    struct {
+        const AP_Int8* enable = nullptr;   //< FENCE_ENABLE
+        const AP_Int8* type = nullptr;     //< FENCE_TYPE
+    } _fence_params;
+
     // Screenplay of the show.
     // 
     // In normal conditions, the screenplay has a single chapter, which holds
@@ -716,6 +884,13 @@ private:
     // from _update_preflight_check_result(). See the values from the
     // DroneShowPreflightCheckFlag enum for more details.
     uint8_t _preflight_check_failures;
+
+    // Structure storing the state of the vibration warning. Updated
+    // periodically from _update_vibration_warning().
+    struct {
+        bool warning;                         //< Whether the vibration levels of the drone are too high
+        uint32_t threshold_crossed_at_msec;   //< Time when the level first crossed the threshold that would toggle the warning; zero if it is not crossing it now
+    } _vibration;
 
     // Properties of the drone show coordinate system, used in-flight. Updated
     // from the parameters set by the user when the drone takes off.
@@ -788,14 +963,22 @@ private:
     // State of the pyro test
     PyroTestState _pyro_test_state;
 
+    // State of the drone show subsystem related to the interactive GCS pixel grid mode
+    PixelGridState _pixel_grid;
+
     // Factory object that can create RGBLed instances that the drone show manager will control
     DroneShowLEDFactory* _rgb_led_factory;
 
     // RGB led that the drone show manager controls
     DroneShowLED* _rgb_led;
 
+    // Current input source of the RGB led that determines what color it will show when
+    // the drone show is being performed. Does not affect the color of the RGB led in
+    // any other drone show execution stage.
+    LightInputSource _rgb_led_input;
+
     // Last RGB color that was sent to the RGB led
-    sb_rgb_color_t _last_rgb_led_color;
+    sb_rgb_color_t _rgb_led_last_color;
 
     // Last guided mode command that was sent
     GuidedModeCommand _last_setpoint;
@@ -816,7 +999,13 @@ private:
 
     // Returns whether the RC switches are currently blocked
     bool _are_rc_switches_blocked();
-    
+
+    // Recalculates the hash of the show configuration if the polygon fence
+    // was reloaded or enabled or disabled since the last calculation. This
+    // catches fences uploaded with the MAVLink mission protocol and changes
+    // in FENCE_ENABLE or FENCE_TYPE.
+    void _check_changes_in_geofence();
+
     // Checks whether there were any changes in the parameters relevant to the
     // execution of the drone show. This has to be called regularly from update()
     void _check_changes_in_parameters();
@@ -874,6 +1063,10 @@ private:
     // with 16 bytes is enough.
     uint8_t* _fill_drone_show_status_packet_buffer(uint8_t* buf) const;
 
+    // Looks up the parameters of the fence library that decide whether the
+    // polygon fence is enabled
+    void _find_fence_params();
+
     // Produces an internally triggered light signal that indicates a failed
     // operation (like a successful compass calibration)
     void _flash_leds_after_failure();
@@ -892,6 +1085,10 @@ private:
         uint8_t red, uint8_t green, uint8_t blue, uint8_t count,
         LightEffectPriority priority, bool enhance_brightness = false
     );
+
+    // Returns the color of the LED light on the drone according to its light
+    // program the given number of seconds after the start time.
+    sb_rgb_color_t _get_desired_color_of_rgb_light_from_light_program_at_seconds(float time);
 
     // Returns a timestamp meant to be used solely for the purposes of implementing
     // light signals. The timestamp is synced to GPS seconds when the drone has
@@ -922,11 +1119,28 @@ private:
     // Handles a MAVLink DATA96 message from the ground station.
     bool _handle_data96_message(mavlink_channel_t chan, const mavlink_message_t& msg);
 
+    // Handles an acknowledgment packet
+    bool _handle_acknowledgment_packet(void* data, uint8_t length);
+
+    // Handles a simple geofence setup packet
+    bool _handle_geofence_setup_packet(void* data, uint8_t length, uint8_t* reply);
+
     // Handles a MAVLink LED_CONTROL message from the ground station.
     bool _handle_led_control_message(const mavlink_message_t& msg);
-    
-    // Handles a time axis configuration packet whose length has already been verified
+
+    // Handles a pixel grid update message from the ground station. This is used for
+    // interactive GCS-based individual LED control for LED pixel grids.
+    bool _handle_pixel_grid_update_message(void* data, uint8_t length);
+
+    // Handles a start time configuration packet
+    bool _handle_start_time_configuration_packet(void* data, uint8_t length);
+
+    // Handles a time axis configuration packet
     bool _handle_time_axis_configuration_packet(void* data, uint8_t length);
+
+    // Handles other protocols wrapped in a MAVLink TUNNEL message. This is currently
+    // used for interactive GCS-based individual LED control for LED pixel grids.
+    bool _handle_tunnel_message(const mavlink_message_t& msg);
 
     // Returns whether the given option flag is set in the SHOW_OPTIONS parameter
     bool _has_option(DroneShowOptionFlag option) const {
@@ -951,7 +1165,12 @@ private:
     // Zero or negative values mean that the default threshold is used from the
     // parameters.
     bool _is_at_takeoff_position_xy(float xy_threshold = 0.0f) const;
-    
+
+    // Returns whether the drone is so close to the ground at the end of the
+    // show that it must land in place instead of executing the post-show
+    // action. Returns false if the altitude of the drone is not known.
+    bool _is_close_to_ground_at_end_of_show() const;
+
     // Returns whether the drone is close enough to the given location. Distances
     // are checked separately in the XY plane and in the Z direction. Negative
     // or zero threshold means that the corresponding check is turned off.
@@ -961,8 +1180,25 @@ private:
     // that it has accurate tiem information.
     bool _is_gps_time_ok() const;
 
+    // Returns whether the polygon fence is enabled in the parameters
+    bool _is_polygon_fence_enabled() const;
+
     // Returns whether pyro events can be handled safely in the current state
     bool _is_pyro_safe_to_fire() const;
+
+    // Returns whether a new time axis configuration packet with the given header can
+    // be accepted now, given the current state of the drone show manager. This is used
+    // to avoid accepting a new time axis configuration packet with a different start
+    // time when the show is already running, which would most likely cause a jump in
+    // the expected position of the drone.
+    bool _is_safe_to_accept_time_axis_configuration_packet(
+        const CustomPackets::time_axis_config_header_t& header) const;
+
+    // Returns whether it is safe to change the start time of the show in the current
+    // stage of the drone show mode. This is used to determine whether we can accept a
+    // new value of the start time parameter or a new time axis configuration packet
+    // whose start time is different from the current one
+    bool _is_safe_to_change_start_time_in_current_stage() const;
 
     // Recalculates the values of some internal variables that are derived from
     // the current trajectory when it is loaded.
@@ -975,7 +1211,6 @@ private:
     bool _run_debug_request_handler(const mavlink_command_int_t &packet) WARN_IF_UNUSED;
 
     bool _load_show_file_from_storage();
-    void _set_show_data_and_take_ownership(uint8_t *value);
 
     // Triggers pending events from the event list of the show
     void _trigger_show_events();
@@ -988,6 +1223,31 @@ private:
     // being in the designated start position before takeoff. This has to be
     // called regularly, but it is rate-limited to 1 Hz
     void _update_preflight_check_result(bool force = 0);
+
+    // Updates whether the vibration levels of the drone are too high, with
+    // hysteresis and a delay in both directions.
+    void _update_vibration_warning();
+
+    // Updates the read-only parameters that expose the metadata of the
+    // loaded show
+    void _update_show_metadata_params();
+
+    // Clears the hash of the show configuration, marking it as not known
+    void _clear_show_config_hash();
+
+    // Recalculates the hash of the show configuration. Must be called when
+    // the show, its coordinate system or the geofence changes.
+    void _update_show_config_hash();
+
+    // Sets the hash of the show configuration and updates the read-only
+    // parameters that expose it. All changes of the hash must go through
+    // this function.
+    void _set_show_config_hash_value(uint32_t value);
+
+    // Sets the value of a read-only parameter and records the change in the
+    // onboard log. The ground station is not notified; it sees the new value
+    // the next time it fetches the parameter.
+    void _update_readonly_param(AP_Int32& param, const char* name, int32_t value);
 
     // Updates the state of the pyro device on the drone. This has to be called
     // regularly at 25 Hz. Takes care of turning off pyro channels after the

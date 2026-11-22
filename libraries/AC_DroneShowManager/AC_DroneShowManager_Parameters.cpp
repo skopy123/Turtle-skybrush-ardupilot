@@ -1,26 +1,36 @@
 #include <AP_GPS/AP_GPS.h>
+#include <AP_Logger/AP_Logger.h>
 #include <AP_Param/AP_Param.h>
 
 #include "AC_DroneShowManager.h"
 #include "DroneShow_Constants.h"
 #include "DroneShowPyroDeviceFactory.h"
 
-static bool is_safe_to_change_start_time_in_stage(DroneShowModeStage stage);
-
 const AP_Param::GroupInfo AC_DroneShowManager::var_info[] = {
     // @Param: START_TIME
     // @DisplayName: Start time
-    // @Description: Start time of drone show as a GPS time of week timestamp (sec), negative if unset
+    // @Description: Start time of drone show as a GPS time of week timestamp (sec), negative if unset. See also SHOW_START_MSEC.
     // @Range: -1 604799
     // @Increment: 1
     // @Units: sec
     // @Volatile: True
     // @User: Standard
     //
-    // Note that we cannot use UNIX timestamps here because ArduPilot stores
-    // all parameters as floats, and floats can represent integers accurately
-    // only up to 2^23 - 1
+    // Note that we cannot use UNIX timestamps here because ArduPilot treats incoming
+    // parameter values from MAVLink PARAM_SET messages as floats (irrespectively of the
+    // internal storage format), so setting the start time via MAVLink would round it
+    // off to the nearest integer that _is_ representable accurately as a float.
     AP_GROUPINFO("START_TIME", 1, AC_DroneShowManager, _params.start_time_gps_sec, -1),
+
+    // @Param: START_MSEC
+    // @DisplayName: Start time, extra millisecond offset
+    // @Description: Number of milliseconds to add to the start time of the show in the SHOW_START_TIME parameter.
+    // @Range: 0 999
+    // @Increment: 1
+    // @Units: msec
+    // @Volatile: True
+    // @User: Standard
+    AP_GROUPINFO("START_MSEC", 40, AC_DroneShowManager, _params.start_time_gps_msec_offset, 0),
 
     // @Param: ORIGIN_LAT
     // @DisplayName: Show origin (latitude)
@@ -320,7 +330,56 @@ const AP_Param::GroupInfo AC_DroneShowManager::var_info[] = {
     // @User: Advanced
     AP_GROUPINFO("MAX_ESC_ERR", 39, AC_DroneShowManager, _params.max_esc_error_rate_pcnt, DEFAULT_MAX_ESC_ERROR_RATE_PCNT),
 
-    // Currently used max parameter ID: 39; update this if you add more parameters.
+    // @Param: MAX_VIBE
+    // @DisplayName: Maximum allowed vibration level
+    // @Description: Vibration level above which the drone reports a vibration warning to the GCS. Zero or negative values disable the check. Vibration levels exceeding the threshold will trigger a status flag but do not abort the show.
+    // @Range: 0 100
+    // @Increment: 1
+    // @Units: m/s/s
+    // @User: Advanced
+    AP_GROUPINFO("MAX_VIBE", 41, AC_DroneShowManager, _params.vibration_warning_threshold, DEFAULT_VIBRATION_WARNING_THRESHOLD),
+
+    // @Param: IDX
+    // @DisplayName: Index of the drone in the show
+    // @Description: Zero-based index of the drone within the loaded show, according to the metadata block of the show file. Zero if the show file does not specify it. Set by the firmware when it loads the show.
+    // @Range: 0 65535
+    // @ReadOnly: True
+    // @User: Standard
+    AP_GROUPINFO_FLAGS("IDX", 42, AC_DroneShowManager, _params.drone_index_in_show, 0, AP_PARAM_FLAG_INTERNAL_USE_ONLY),
+
+    // @Param: ID_HI
+    // @DisplayName: Show ID (upper 16 bits)
+    // @Description: Upper 16 bits of the 4-byte ID of the loaded show, according to the metadata block of the show file: the first byte of the ID times 256 plus the second byte. Zero if the show file does not specify the ID. Set by the firmware when it loads the show.
+    // @Range: 0 65535
+    // @ReadOnly: True
+    // @User: Standard
+    AP_GROUPINFO_FLAGS("ID_HI", 43, AC_DroneShowManager, _params.show_id_hi, 0, AP_PARAM_FLAG_INTERNAL_USE_ONLY),
+
+    // @Param: ID_LO
+    // @DisplayName: Show ID (lower 16 bits)
+    // @Description: Lower 16 bits of the 4-byte ID of the loaded show, according to the metadata block of the show file: the third byte of the ID times 256 plus the fourth byte. Zero if the show file does not specify the ID. Set by the firmware when it loads the show.
+    // @Range: 0 65535
+    // @ReadOnly: True
+    // @User: Standard
+    AP_GROUPINFO_FLAGS("ID_LO", 44, AC_DroneShowManager, _params.show_id_lo, 0, AP_PARAM_FLAG_INTERNAL_USE_ONLY),
+
+    // @Param: CFG_HASH_HI
+    // @DisplayName: Show configuration hash (upper 16 bits)
+    // @Description: Upper 16 bits of the 32-bit hash of the show configuration (show ID, show coordinate system and geofence). Drones with the same show configuration have the same hash. Zero if the hash is not known. Set by the firmware when the show configuration changes.
+    // @Range: 0 65535
+    // @ReadOnly: True
+    // @User: Standard
+    AP_GROUPINFO_FLAGS("CFG_HASH_HI", 45, AC_DroneShowManager, _params.config_hash_hi, 0, AP_PARAM_FLAG_INTERNAL_USE_ONLY),
+
+    // @Param: CFG_HASH_LO
+    // @DisplayName: Show configuration hash (lower 16 bits)
+    // @Description: Lower 16 bits of the 32-bit hash of the show configuration (show ID, show coordinate system and geofence). Drones with the same show configuration have the same hash. Zero if the hash is not known. Set by the firmware when the show configuration changes.
+    // @Range: 0 65535
+    // @ReadOnly: True
+    // @User: Standard
+    AP_GROUPINFO_FLAGS("CFG_HASH_LO", 46, AC_DroneShowManager, _params.config_hash_lo, 0, AP_PARAM_FLAG_INTERNAL_USE_ONLY),
+
+    // Currently used max parameter ID: 46; update this if you add more parameters.
     // Note that the max parameter ID may appear in the middle of the above list.
 
     AP_GROUPEND
@@ -354,6 +413,7 @@ bool AC_DroneShowManager::should_switch_to_show_mode_when_authorized() const
 void AC_DroneShowManager::_check_changes_in_parameters()
 {
     static int32_t last_seen_start_time_gps_sec = -1;
+    static int16_t last_seen_start_time_gps_msec_offset = 0;
     static bool last_seen_show_authorization_state = false;
     static int16_t last_seen_control_rate_hz = DEFAULT_UPDATE_RATE_HZ;
     static int32_t last_seen_origin_lat = 200000000;        // intentionally invalid
@@ -369,7 +429,10 @@ void AC_DroneShowManager::_check_changes_in_parameters()
         _params.origin_amsl_mm != last_seen_origin_amsl_mm ||
         !is_zero(_params.orientation_deg - last_seen_orientation_deg)
     );
-    bool new_start_time_pending = _params.start_time_gps_sec != last_seen_start_time_gps_sec;
+    bool new_start_time_pending = (
+        _params.start_time_gps_sec != last_seen_start_time_gps_sec ||
+        _params.start_time_gps_msec_offset != last_seen_start_time_gps_msec_offset
+    );
     bool new_show_authorization_pending = _params.authorization != last_seen_show_authorization_state;
 
     if (new_coordinate_system_pending) {
@@ -382,6 +445,7 @@ void AC_DroneShowManager::_check_changes_in_parameters()
         last_seen_orientation_deg = _params.orientation_deg;
 
         _copy_show_coordinate_system_from_parameters_to(_tentative_show_coordinate_system);
+        _update_show_config_hash();
     }
 
     if (new_start_time_pending) {
@@ -389,7 +453,7 @@ void AC_DroneShowManager::_check_changes_in_parameters()
         // already performing the show, or if the show is supposed to be started
         // with a countdown
         if (
-            !is_safe_to_change_start_time_in_stage(_stage_in_drone_show_mode) ||
+            !_is_safe_to_change_start_time_in_current_stage() ||
             !uses_gps_time_for_show_start()
         ) {
             new_start_time_pending = false;
@@ -398,22 +462,37 @@ void AC_DroneShowManager::_check_changes_in_parameters()
 
     if (new_start_time_pending && (_is_gps_time_ok() || _params.start_time_gps_sec < 0)) {
         last_seen_start_time_gps_sec = _params.start_time_gps_sec;
+        last_seen_start_time_gps_msec_offset = _params.start_time_gps_msec_offset;
 
         if (last_seen_start_time_gps_sec >= 0) {
-            start_time_gps_msec = last_seen_start_time_gps_sec * 1000;
-            if (AP::gps().time_week_ms() < start_time_gps_msec) {
-                // Interpret the given timestamp in the current GPS week as it is in
-                // the future even with the same GPS week number
-                _start_time_unix_usec = AP::gps().istate_time_to_epoch_ms(
-                    AP::gps().time_week(), start_time_gps_msec
-                ) * 1000ULL;
-            } else {
-                // Interpret the given timestamp in the next GPS week as it is in
-                // the past with the same GPS week number
-                _start_time_unix_usec = AP::gps().istate_time_to_epoch_ms(
-                    AP::gps().time_week() + 1, start_time_gps_msec
-                ) * 1000ULL;
+            const int64_t half_week_msec = GPS_WEEK_LENGTH_SEC * 1000LL / 2;
+            uint16_t gps_week_of_start_time = AP::gps().time_week();
+            int64_t diff_msec;
+
+            start_time_gps_msec = last_seen_start_time_gps_sec * 1000 + last_seen_start_time_gps_msec_offset;
+
+            // The start time is given as a time-of-week only, without a week
+            // number. We assume that the start time is close to the current
+            // time (within half a week) and pick the GPS week that puts it
+            // nearest to the current time. This way a start time that is
+            // slightly in the past (e.g., re-sent by the GCS after the show
+            // has started) is interpreted correctly instead of being pushed
+            // to the next week, and week boundaries are handled in both
+            // directions.
+            diff_msec = static_cast<int64_t>(start_time_gps_msec) - static_cast<int64_t>(AP::gps().time_week_ms());
+            if (diff_msec > half_week_msec) {
+                // Start time is late in the week while we are early in the
+                // week, so it belongs to the previous week
+                gps_week_of_start_time--;
+            } else if (diff_msec < -half_week_msec) {
+                // Start time is early in the week while we are late in the
+                // week, so it belongs to the next week
+                gps_week_of_start_time++;
             }
+
+            _start_time_unix_usec = AP::gps().istate_time_to_epoch_ms(
+                gps_week_of_start_time, start_time_gps_msec
+            ) * 1000ULL;
 
             if (_start_time_requested_by == StartTimeSource::NONE) {
                 _start_time_requested_by = StartTimeSource::PARAMETER;
@@ -476,11 +555,18 @@ bool AC_DroneShowManager::_copy_show_coordinate_system_from_parameters_to(
     return true;
 }
 
-static bool is_safe_to_change_start_time_in_stage(DroneShowModeStage stage) {
-    return (
-        stage == DroneShow_Off ||
-        stage == DroneShow_Init ||
-        stage == DroneShow_WaitForStartTime ||
-        stage == DroneShow_Landed
-    );
+void AC_DroneShowManager::_update_readonly_param(AP_Int32& param, const char* name, int32_t value)
+{
+    if (param == value) {
+        return;
+    }
+
+    param.set(value);
+
+#if HAL_LOGGING_ENABLED
+    AP_Logger *logger = AP_Logger::get_singleton();
+    if (logger != nullptr) {
+        logger->Write_Parameter(name, static_cast<float>(value));
+    }
+#endif
 }

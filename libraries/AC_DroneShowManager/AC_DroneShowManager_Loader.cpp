@@ -7,7 +7,6 @@
 
 #include "AC_DroneShowManager.h"
 #include "DroneShow_Constants.h"
-#include "skybrush/rth_plan.h"
 
 extern const AP_HAL::HAL &hal;
 
@@ -35,7 +34,11 @@ bool AC_DroneShowManager::reload_or_clear_show(bool do_clear)
         }
     }
 
-    return _load_show_file_from_storage();
+    bool success = _load_show_file_from_storage();
+    _update_show_metadata_params();
+    _update_show_config_hash();
+
+    return success;
 }
 
 bool AC_DroneShowManager::reload_show_from_storage()
@@ -77,14 +80,19 @@ bool AC_DroneShowManager::_load_show_file_from_storage()
     // any memory used by the previously loaded show
     sb_screenplay_clear(&_screenplay);
     sb_screenplay_scene_clear_contents(&_main_show_scene);
+    sb_show_metadata_clear(&_show_metadata);
     sb_show_controller_notify_screenplay_changed(&_show_controller);
     sb_show_controller_update_time_msec(&_show_controller, 0);
     _invalidate_projected_wall_clock_time_at_takeoff();
+    _pixel_grid.reset();
     if (_show_data)
     {
         free(_show_data);
         _show_data = nullptr;
     }
+
+    // Cleanup segment ends here. At this point, any previously loaded show has been
+    // cleared and no pointers should exist to the old data.
 
     // Check whether the show file exists
     retval = AP::FS().stat(SHOW_FILE, &stat_data);
@@ -167,7 +175,26 @@ bool AC_DroneShowManager::_load_show_file_from_storage()
         sb_screenplay_update_from_binary_file_in_memory(&_screenplay, show_data, stat_data.st_size)
     );
     success = retval == SB_SUCCESS;
-    
+
+    // Update pixel grid data and palette if the show file has such a block
+    success &= _pixel_grid.update_from_binary_file_in_memory(show_data, stat_data.st_size);
+
+    // Parse the metadata block of the show file. A missing block is the same
+    // as an empty one, but a corrupted block rejects the entire show.
+    if (success)
+    {
+        retval = static_cast<int>(
+            sb_show_metadata_update_from_binary_file_in_memory(
+                &_show_metadata, show_data, stat_data.st_size
+            )
+        );
+        if (retval != SB_SUCCESS && retval != SB_ENOENT)
+        {
+            hal.console->printf("Corrupted metadata block in show file\n");
+            success = false;
+        }
+    }
+
     if (success)
     {
         // Since the screenplay was updated, we need to let the show controller know
@@ -193,6 +220,14 @@ bool AC_DroneShowManager::_load_show_file_from_storage()
                 _trajectory_stats.takeoff_time_sec, 
                 _trajectory_stats.landing_time_sec
             );
+
+            uint8_t show_id[SB_SHOW_METADATA_SHOW_ID_LENGTH];
+            get_show_id(show_id);
+            hal.console->printf(
+                "Show ID: %02x%02x%02x%02x, drone index: %u\n",
+                show_id[0], show_id[1], show_id[2], show_id[3],
+                static_cast<unsigned int>(get_drone_index_in_show())
+            );
         }
     }
     else
@@ -204,16 +239,25 @@ bool AC_DroneShowManager::_load_show_file_from_storage()
     {
         // Adjust the timestamps of pyro events if needed. Also set the duration of
         // each scene to the duration of its trajectory to ensure that we consider the
-        // show as finished when the trajectory ends.
+        // show as finished when the trajectory ends. The last (currently the only)
+        // scene is also marked as dynamic so we know that we are free to adjust its
+        // duration later if the trajectory changes (e.g., after takeoff, when the
+        // trajectory is circular and we need to compensate for the actual takeoff
+        // position).
         size_t i, num_scenes = sb_screenplay_size(&_screenplay);
         for (i = 0; i < num_scenes; i++)
         {
             sb_screenplay_scene_t* scene = sb_screenplay_get_scene_ptr(&_screenplay, i);
             sb_event_list_t* event_list = scene ? sb_screenplay_scene_get_events(scene) : nullptr;
             sb_trajectory_t* trajectory = scene ? sb_screenplay_scene_get_trajectory(scene) : nullptr;
-            
+            bool is_last = (i == num_scenes - 1);
+
             if (trajectory) {
-                sb_screenplay_scene_set_duration_msec(scene, _trajectory_stats.duration_msec);
+                sb_screenplay_scene_set_duration_msec(scene,
+                    is_last
+                        ? static_cast<uint32_t>(_trajectory_stats.landing_time_sec * 1000.0f)
+                        : _trajectory_stats.duration_msec
+                );
             }
 
             if (event_list && _params.pyro_spec.time_compensation_msec != 0)
@@ -223,9 +267,13 @@ bool AC_DroneShowManager::_load_show_file_from_storage()
                     -_params.pyro_spec.time_compensation_msec
                 );
             }
+
+            if (is_last) {
+                sb_screenplay_scene_set_flag(scene, SB_SCREENPLAY_SCENE_FLAG_DYNAMIC_DURATION);
+            }
         }
     }
-    
+
     if (success)
     {
         // move ownership of the show data to the class member
@@ -243,6 +291,7 @@ bool AC_DroneShowManager::_load_show_file_from_storage()
     else
     {
         sb_screenplay_clear(&_screenplay);
+        sb_show_metadata_clear(&_show_metadata);
     }
     
     // Now that the screenplay is updated, forget the previous sequence number of
@@ -283,7 +332,12 @@ bool AC_DroneShowManager::_recalculate_trajectory_properties()
     _trajectory_stats.takeoff_time_sec = _trajectory_stats.landing_time_sec = -1;
     _trajectory_is_circular = false;
 
-    stats_calculator.min_ascent = get_takeoff_altitude_cm() * 10.0f; /* [mm] */
+    // Note that we don't use get_landing_altitude_mm() here. If we need to adjust for
+    // placement errors at the end of the trajectory, we need a real difference between
+    // the takeoff and landing altitudes such that we start the placement correction
+    // at the takeoff altitude (say, 2.5m) and end the correction at the landing
+    // altitude (say, 1m).
+    stats_calculator.min_ascent = get_takeoff_altitude_mm();
     stats_calculator.preferred_descent = stats_calculator.min_ascent;
     stats_calculator.takeoff_speed = get_takeoff_speed_m_sec() * 1000.0f; /* [mm/s] */
     stats_calculator.acceleration = get_takeoff_acceleration_m_ss() * 1000.0f; /* [mm/s/s] */
@@ -362,19 +416,4 @@ bool AC_DroneShowManager::_recalculate_trajectory_properties()
     _invalidate_projected_wall_clock_time_at_takeoff();
 
     return true;
-}
-
-void AC_DroneShowManager::_set_show_data_and_take_ownership(uint8_t *value)
-{
-    if (_show_data == value)
-    {
-        return;
-    }
-
-    if (_show_data)
-    {
-        free(_show_data);
-    }
-
-    _show_data = value;
 }

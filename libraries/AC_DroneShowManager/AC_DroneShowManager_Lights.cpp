@@ -32,6 +32,53 @@ namespace Colors {
     static const sb_rgb_color_t WHITE = { 255, 255, 255 };
 };
 
+AC_DroneShowManager::LightInputSource::LightInputSource() {
+    clear();
+}
+
+void AC_DroneShowManager::LightInputSource::clear() {
+    _type = LightInputSourceType::LightInputSource_Show;
+    _fixed_color = Colors::BLACK;
+}
+
+bool AC_DroneShowManager::LightInputSource::configure_from_event_payload(const uint8_t* payload, size_t size) {
+    if (!payload || size < 4) {
+        return false;
+    }
+
+    // First byte of payload is the index of the light to affect.
+    // Currently we only have one light, so this must be zero.
+    if (payload[0] != 0) {
+        return false;
+    }
+
+    switch (payload[1]) {
+        case 0: {
+            // Second byte is 0 to use a fixed color
+            uint16_t color_rgb565 = (static_cast<uint16_t>(payload[2]) << 8) | payload[3];
+            set_type(LightInputSource_Fixed);
+            set_fixed_color(sb_rgb_color_decode_rgb565(color_rgb565));         break;
+        }
+
+        case 1:
+            // Second byte is 1 to use the color from the show
+            set_type(LightInputSource_Show);
+            break;
+
+        case 2:
+            // Second byte is 2 to let the light to be controlled by
+            // the GCS interactively as a pixel grid
+            set_type(LightInputSource_PixelGrid);
+            break;
+
+        default:
+            // Unknown value for the second byte, ignore
+            return false;
+    }
+
+    return true;
+}
+
 static float get_modulation_factor_for_light_effect(
     uint32_t timestamp, LightEffectType effect, uint16_t period_msec, uint16_t phase_msec
 );
@@ -41,15 +88,26 @@ sb_rgb_color_t AC_DroneShowManager::get_rth_transition_color() const {
 }
 
 sb_rgb_color_t AC_DroneShowManager::get_desired_color_of_rgb_light() {
-    float elapsed_time = get_elapsed_time_since_start_sec();
-    if (elapsed_time >= 0) {
-        return get_desired_color_of_rgb_light_at_seconds(elapsed_time);
-    } else {
-        return Colors::WHITE_DIM;
+    switch (_rgb_led_input.type()) {
+        case LightInputSource_Fixed:
+            return _rgb_led_input.fixed_color();
+
+        case LightInputSource_PixelGrid:
+            return _pixel_grid.color;
+
+        case LightInputSource_Show: {
+            float elapsed_time = get_elapsed_time_since_start_sec();
+            return elapsed_time >= 0
+                ? _get_desired_color_of_rgb_light_from_light_program_at_seconds(elapsed_time)
+                : Colors::WHITE_DIM;
+        }
+
+        default:
+            return Colors::WHITE_DIM;
     }
 }
 
-sb_rgb_color_t AC_DroneShowManager::get_desired_color_of_rgb_light_at_seconds(float time)
+sb_rgb_color_t AC_DroneShowManager::_get_desired_color_of_rgb_light_from_light_program_at_seconds(float time)
 {
     const sb_control_output_t* output = _get_raw_show_control_output_at_seconds(time);
     sb_rgb_color_t result;
@@ -247,12 +305,13 @@ void AC_DroneShowManager::_update_lights()
     bool enhance_brightness = false;
     bool has_failsafe_color = false;
     int brightness = _params.preflight_light_signal_brightness;
-    uint8_t pattern = 0b11111111;
+    const uint8_t ALL_ON = 0b11111111;
     const uint8_t BLINK = 0b11110000;
     const uint8_t BLINK_TWICE_PER_SECOND = 0b11001100;
     const uint8_t FLASH_ONCE_PER_SECOND = 0b10000000;
     const uint8_t FLASH_TWICE_PER_SECOND = 0b10100000;
     const uint8_t FLASH_FOUR_TIMES_PER_SECOND = 0b10101010;
+    uint8_t pattern = ALL_ON;
     float elapsed_time;
     float pulse = 0.0f;
     float factor;
@@ -411,7 +470,7 @@ void AC_DroneShowManager::_update_lights()
             // show has started already; otherwise blink green twice per second.
             elapsed_time = get_elapsed_time_since_start_sec();
             if (elapsed_time >= 0) {
-                color = get_desired_color_of_rgb_light_at_seconds(elapsed_time);
+                color = get_desired_color_of_rgb_light();
                 light_signal_affected_by_brightness_setting = false;
             } else {
                 color = Colors::GREEN;
@@ -457,14 +516,20 @@ void AC_DroneShowManager::_update_lights()
                 color = Colors::YELLOW;
                 pulse = 0.5;
             } else if (has_authorization()) {
+                // Stores whether we are currently idling on the ground and there is no
+                // important message that we attempt to convey with the lights
+                bool idle = false;
+
                 if (is_performance_completed()) {
                     // if we have already landed but show mode is reset from
                     // another mode, we just keep calm with solid green
                     color = Colors::GREEN_DIM;
+                    idle = true;
                 } else if (get_time_until_takeoff_sec() > 10) {
                     // if there is plenty of time until takeoff, we pulse slowly
                     color = Colors::GREEN_DIM;
                     pulse = 0.5;
+                    idle = true;
                 } else if (has_authorization_to_start_motors()) {
                     // if we are about to take off soon, flash quickly
                     color = Colors::GREEN;
@@ -473,6 +538,17 @@ void AC_DroneShowManager::_update_lights()
                     // authorized for lights, but not authorized to start
                     // motors. Show the color according to the light program
                     color = get_desired_color_of_rgb_light();
+                    light_signal_affected_by_brightness_setting = false;
+                }
+
+                // If we are currently just idling on the ground and there is no
+                // important message that we attempt to convey with the lights, _and_
+                // the light input source is a pixel grid, allow the pixel grid to show
+                // the color dictated by the GCS to facilitate on-ground testing of the
+                // grid
+                if (idle && _rgb_led_input.type() == LightInputSource_PixelGrid) {
+                    color = get_desired_color_of_rgb_light();
+                    light_signal_affected_by_brightness_setting = false;
                 }
             } else {
                 color = Colors::LIGHT_BLUE;
@@ -544,7 +620,7 @@ void AC_DroneShowManager::_update_lights()
         color = Colors::BLACK;
     }
 
-    _last_rgb_led_color = color;
+    _rgb_led_last_color = color;
 
     if (_rgb_led) {
         // No need to test whether the RGB values or the gamma correction

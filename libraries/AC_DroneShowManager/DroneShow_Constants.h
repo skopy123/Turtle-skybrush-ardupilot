@@ -43,6 +43,12 @@
 // Distance threshold for the trajectory to be considered circular, in meters.
 #define DEFAULT_START_END_XY_DISTANCE_THRESHOLD_METERS 0.5f
 
+// Maximum altitude above home at the end of the show below which the drone
+// always lands in place, irrespectively of the post-show action, in meters.
+// The effective threshold is the minimum of this value and half of the takeoff
+// altitude.
+#define MAX_ALTITUDE_FOR_LANDING_IN_PLACE_AT_END_OF_SHOW_METERS 1.0f
+
 // Default horizontal bubble fence drift tolerance level, in meters.
 #define DEFAULT_BUBBLE_FENCE_MAX_XY_DRIFT_METERS 10.0f
 
@@ -55,6 +61,23 @@
 // Default maximum allowed ESC error rate. Error rates exceeding this threshold,
 // in the range [-1, 100] where 0 means 0%, 100 means 100%, -1 means disabled.
 #define DEFAULT_MAX_ESC_ERROR_RATE_PCNT -1
+
+// Default vibration level above which the drone reports a vibration warning,
+// in m/s/s. Matches the level that the ArduPilot docs consider worth
+// investigating.
+#define DEFAULT_VIBRATION_WARNING_THRESHOLD 30.0f
+
+// Time for which the vibration level must stay above the threshold before the
+// vibration warning is raised, in milliseconds
+#define VIBRATION_WARNING_RAISE_DELAY_MSEC 1000
+
+// Time for which the vibration level must stay below the lower threshold
+// before the vibration warning is cleared, in milliseconds
+#define VIBRATION_WARNING_CLEAR_DELAY_MSEC 3000
+
+// Ratio of the lower threshold that clears the vibration warning to the upper
+// threshold that raises it
+#define VIBRATION_WARNING_CLEAR_RATIO 0.8f
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
 // UDP port that the drone show manager uses to broadcast the status of the RGB light
