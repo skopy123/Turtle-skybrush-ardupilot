@@ -85,6 +85,9 @@ private:
     // have we failed to expand filters?
     bool _alloc_has_failed;
 
+    // calculate the number of notch filters needed for the given config,
+    uint16_t notch_count(uint8_t num_sources, uint8_t num_harmonics, uint8_t composite_notches) const;
+
     // minimum frequency (from INS_HNTCH_FREQ * INS_HNTCH_FM_RAT)
     float _minimum_freq;
 
@@ -114,6 +117,7 @@ public:
         EnableOnAllIMUs = 1<<3,
         TripleNotch = 1<<4,
         TreatLowAsMin = 1<<5,
+        QuintupleNotch = 1<<6,
     };
 
     HarmonicNotchFilterParams(void);
@@ -161,9 +165,7 @@ public:
     void save_params();
 
     // return the number of composite notches given the options
-    uint8_t num_composite_notches(void) const {
-        return hasOption(Options::DoubleNotch) ? 2 : hasOption(Options::TripleNotch) ? 3: 1;
-    }
+    uint8_t num_composite_notches(void) const;
 
 private:
     // configured notch harmonics

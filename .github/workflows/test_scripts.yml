@@ -1,6 +1,10 @@
 name: test scripts
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    branches: ['**']  # excludes tag pushes
+  pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{github.workflow}}-${{ github.ref }}
@@ -20,10 +24,11 @@ jobs:
             astyle-cleanliness,
             validate_board_list,
             logger_metadata,
+            param-file-validation,
        ]
     steps:
       # git checkout the PR
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: 'recursive'
       - name: test ${{matrix.config}}

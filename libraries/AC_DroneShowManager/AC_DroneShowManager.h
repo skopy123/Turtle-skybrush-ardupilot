@@ -272,7 +272,7 @@ public:
     // false when failed to update the command.
     bool get_current_guided_mode_command_to_send(
         GuidedModeCommand& command,
-        int32_t default_yaw_cd,
+        float default_yaw_rad,
         bool altitude_locked_above_takeoff_altitude = false
     ) WARN_IF_UNUSED;
 
@@ -372,7 +372,7 @@ public:
 
     // Returns the takeoff acceleration in meters per second squared
     float get_takeoff_acceleration_m_ss() const {
-        float result = _wp_nav ? _wp_nav->get_accel_z() / 100.0f : 0;
+        float result = _wp_nav ? _wp_nav->get_accel_D_mss() : 0;
         if (result <= 0) {
             /* safety check */
             result = DEFAULT_TAKEOFF_ACCELERATION_METERS_PER_SEC_SEC;

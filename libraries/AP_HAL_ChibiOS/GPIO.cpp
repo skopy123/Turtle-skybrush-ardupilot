@@ -24,9 +24,7 @@
 #ifndef HAL_BOOTLOADER_BUILD
 #include <SRV_Channel/SRV_Channel.h>
 #endif
-#ifndef HAL_NO_UARTDRIVER
 #include <GCS_MAVLink/GCS.h>
-#endif
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 #include <AP_Math/AP_Math.h>
 
@@ -78,9 +76,6 @@ static struct gpio_entry *gpio_by_pin_num(uint8_t pin_num, bool check_enabled=tr
 #endif
     return NULL;
 }
-
-static void pal_interrupt_cb(void *arg);
-static void pal_interrupt_cb_functor(void *arg);
 
 GPIO::GPIO()
 {}
@@ -165,7 +160,7 @@ void GPIO::setup_alt_config(void)
             }
             const iomode_t mode = alt.mode & ~PAL_STM32_HIGH;
             const uint8_t odr = (alt.mode & PAL_STM32_HIGH)?1:0;
-            palSetLineMode(alt.line, mode);
+            stm32_set_line_mode(alt.line, mode);
             palWriteLine(alt.line, odr);
         }
     }
@@ -229,7 +224,7 @@ void GPIO::pinMode(uint8_t pin, uint8_t output)
             }
         }
 #endif
-        palSetLineMode(g->pal_line, g->mode);
+        stm32_set_line_mode(g->pal_line, g->mode);
         g->is_input = !output;
     }
 }
@@ -256,7 +251,7 @@ void GPIO::write(uint8_t pin, uint8_t value)
         if (g->is_input) {
             // control pullup/pulldown
             g->mode = value==1?PAL_MODE_INPUT_PULLUP:PAL_MODE_INPUT_PULLDOWN;
-            palSetLineMode(g->pal_line, g->mode);
+            stm32_set_line_mode(g->pal_line, g->mode);
         } else if (value == PAL_LOW) {
             palClearLine(g->pal_line);
         } else {
@@ -275,7 +270,7 @@ void GPIO::toggle(uint8_t pin)
 {
     struct gpio_entry *g = gpio_by_pin_num(pin);
     if (g) {
-        palToggleLine(g->pal_line);
+        stm32_toggle_line(g->pal_line);
         return;
     }
 #if HAL_WITH_IO_MCU
@@ -301,6 +296,11 @@ AP_HAL::DigitalSource* GPIO::channel(uint16_t pin)
 }
 
 extern const AP_HAL::HAL& hal;
+
+#if PAL_USE_CALLBACKS == TRUE // then ChibiOS PAL event funcs/types are declared
+
+static void pal_interrupt_cb(void *arg);
+static void pal_interrupt_cb_functor(void *arg);
 
 /*
    Attach an interrupt handler to a GPIO pin number. The pin number
@@ -393,6 +393,8 @@ bool GPIO::_attach_interrupt(ioline_t line, palcallback_t cb, void *p, uint8_t m
     return ret;
 }
 
+#endif // PAL_USE_CALLBACKS == TRUE
+
 bool GPIO::usb_connected(void)
 {
     return _usb_connected;
@@ -404,7 +406,7 @@ DigitalSource::DigitalSource(ioline_t _line) :
 
 void DigitalSource::mode(uint8_t output)
 {
-    palSetLineMode(line, output);
+    stm32_set_line_mode(line, output);
 }
 
 uint8_t DigitalSource::read()
@@ -419,7 +421,7 @@ void DigitalSource::write(uint8_t value)
 
 void DigitalSource::toggle()
 {
-    palToggleLine(line);
+    stm32_toggle_line(line);
 }
 
 #if HAL_WITH_IO_MCU
@@ -437,6 +439,8 @@ void IOMCU_DigitalSource::toggle()
     iomcu.toggle_GPIO(pin);
 }
 #endif // HAL_WITH_IO_MCU
+
+#if PAL_USE_CALLBACKS == TRUE // then ChibiOS PAL event funcs/types are declared
 
 static void pal_interrupt_cb(void *arg)
 {
@@ -474,6 +478,8 @@ static void pal_interrupt_cb_functor(void *arg)
     }
     (g->fn)(g->pin_num, palReadLine(g->pal_line), now);
 }
+
+#endif // PAL_USE_CALLBACKS == TRUE
 
 /*
   handle interrupt from pin change for wait_pin()
@@ -594,7 +600,7 @@ void GPIO::set_mode(uint8_t pin, uint32_t mode)
 {
     auto *p = gpio_by_pin_num(pin);
     if (p) {
-        palSetLineMode(p->pal_line, ioline_t(mode));
+        stm32_set_line_mode(p->pal_line, ioline_t(mode));
     }
 }
 #endif
@@ -621,9 +627,7 @@ void GPIO::timer_tick()
         // INTERNAL_ERROR() to get the reporting mechanism
 
         if (_gpio_tab[i].isr_disabled_ticks == 0) {
-#ifndef HAL_NO_UARTDRIVER
             GCS_SEND_TEXT(MAV_SEVERITY_ERROR,"ISR flood on pin %u", _gpio_tab[i].pin_num);
-#endif
             // Only trigger internal error if armed
             if (hal.util->get_soft_armed()) {
                 INTERNAL_ERROR(AP_InternalError::error_t::gpio_isr);
@@ -644,9 +648,7 @@ void GPIO::timer_tick()
         const uint8_t ISR_retry_ticks = 100U;
         if ((_gpio_tab[i].isr_disabled_ticks > ISR_retry_ticks) && (_gpio_tab[i].fn != nullptr)) {
             // Try re-enabling
-#ifndef HAL_NO_UARTDRIVER
             GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "Retrying pin %d after ISR flood", _gpio_tab[i].pin_num);
-#endif
             if (attach_interrupt(_gpio_tab[i].pin_num, _gpio_tab[i].fn, _gpio_tab[i].isr_mode)) {
                 // Success, reset quota
                 _gpio_tab[i].isr_quota = quota;

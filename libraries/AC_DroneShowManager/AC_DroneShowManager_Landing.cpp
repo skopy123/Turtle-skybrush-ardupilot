@@ -67,9 +67,9 @@ bool AC_DroneShowManager::_is_close_to_ground_at_end_of_show() const
 float AC_DroneShowManager::get_landing_speed_m_sec() const {
     float value = 0.0f;
 
-    if (AP_Param::get("LAND_SPEED", value)) {
+    if (AP_Param::get("LAND_SPD_MS", value)) {
         if (value >= 0.0f && isfinite(value)) {
-            return value / 100.0f; // Convert from cm/s to m/s
+            return value;
         }
     }
 
